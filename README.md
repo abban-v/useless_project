@@ -2,26 +2,25 @@
 
 
 
-# [Project Name] 🎯
+# Randomly Assembled Garbage 😘
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: RAG
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
-
+- Team lead: Abban C Varughese - College of Engineering Trivandrum
+- Member 2: Joseph Jayan - College of Engineering Trivandrum
+- 
 ### Project Description
-[2-3 lines about what your project does]
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHH
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+Life is too easy
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+Software Engineers
 
 ## Technical Details
 ### Technologies/Components Used
@@ -31,10 +30,6 @@ For Software:
 - [Libraries used]
 - [Tools used]
 
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
 
 ### Implementation
 For Software:
@@ -60,25 +55,6 @@ For Software:
 # Diagrams
 ![Workflow](Add your workflow/architecture diagram here)
 *Add caption explaining your workflow*
-
-For Hardware:
-
-# Schematic & Circuit
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
-
-# Build Photos
-![Components](Add photo of your components here)
-*List out all components shown*
-
-![Build](Add photos of build process here)
-*Explain the build steps*
-
-![Final](Add photo of final product here)
-*Explain the final build*
 
 ### Project Demo
 # Video
