@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+assets/sounds/*.wav
