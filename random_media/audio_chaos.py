@@ -1,7 +1,7 @@
 """
 Multi-Track Chaos Audio Engine for Click Chaos Module.
 Plays 'music/meow.m4a' on cat spawn thresholds and manages independent 60% chance
-playback of all ambient chaos tracks (coconut.m4a, scream.m4a, scream2.m4a, song.m4a)
+playback of all ambient chaos tracks (coconut.m4a, scream.m4a, scream2.m4a, song.m4a, song2.m4a, song3.m4a)
 concurrently using native Windows COM WMPlayer.OCX dispatched via the Tkinter message loop.
 """
 
@@ -19,6 +19,27 @@ MUSIC_DIR = Path(__file__).parent.parent / "music"
 MEOW_PATH = MUSIC_DIR / "meow.m4a"
 
 _active_engines = set()
+_track_duration_cache = {}
+
+
+def get_track_duration(file_path: str) -> float:
+    """Returns the cached duration of an audio track in seconds via Windows Media Player."""
+    p_str = str(Path(file_path).resolve())
+    if p_str in _track_duration_cache:
+        return _track_duration_cache[p_str]
+
+    dur = 30.0
+    try:
+        wmp = win32com.client.Dispatch("WMPlayer.OCX")
+        media = wmp.newMedia(p_str)
+        d = float(media.duration)
+        if d > 0:
+            dur = d
+    except Exception:
+        pass
+
+    _track_duration_cache[p_str] = dur
+    return dur
 
 
 def is_chaos_audio_playing() -> bool:
@@ -114,24 +135,31 @@ class ChaosAudioEngine:
         # Allow natural overlapping meows while preventing runaway instantiation
         if now - self._last_meow_time > 0.35:
             self._last_meow_time = now
-            self.play_track(str(MEOW_PATH.resolve()), 3.0, is_music=False)
+            duration = get_track_duration(str(MEOW_PATH.resolve()))
+            self.play_track(str(MEOW_PATH.resolve()), duration, is_music=False)
 
     def roll_music_chaos(self, chance: float = CLICK_MUSIC_CHANCE):
         """
         Evaluates an independent 60% chance for EACH track in music/ (excluding meow.m4a).
+        Supports all tracks in music/ including song2.m4a, song3.m4a, coconut.m4a,
+        scream.m4a, scream2.m4a, song.m4a, etc.
         Multiple tracks can play simultaneously.
         """
         if not MUSIC_DIR.exists():
             return
 
-        for track_path in MUSIC_DIR.glob("*.m4a"):
-            if track_path.name.lower() == "meow.m4a":
-                continue
+        valid_exts = {".m4a", ".mp3", ".wav", ".aac", ".ogg"}
+        tracks = [
+            p for p in MUSIC_DIR.iterdir()
+            if p.is_file() and p.suffix.lower() in valid_exts and p.name.lower() != "meow.m4a"
+        ]
 
+        for track_path in tracks:
             roll = random.random()
             if roll < chance:
-                print(f"[ChaosAudio] Track 60% HIT: Playing {track_path.name} (roll: {roll:.2f})")
-                self.play_track(str(track_path.resolve()), 30.0, is_music=True)
+                duration = get_track_duration(str(track_path.resolve()))
+                print(f"[ChaosAudio] Track 60% HIT: Playing {track_path.name} ({duration:.1f}s, roll: {roll:.2f})")
+                self.play_track(str(track_path.resolve()), duration, is_music=True)
 
     def is_chaos_audio_playing(self) -> bool:
         """Returns True if any chaos track or meow is currently active."""
