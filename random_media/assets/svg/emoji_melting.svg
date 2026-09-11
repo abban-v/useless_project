@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Emoji yellow-orange gradient -->
+    <radialGradient id="meltGrad" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffeb3b"/>
+      <stop offset="65%" stop-color="#ffb300"/>
+      <stop offset="95%" stop-color="#f57c00"/>
+      <stop offset="100%" stop-color="#e65100"/>
+    </radialGradient>
+
+    <!-- Liquid drop highlight gradient -->
+    <linearGradient id="dropHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff9c4" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffb300" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <!-- Puddle gradient -->
+    <linearGradient id="puddleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e65100"/>
+      <stop offset="40%" stop-color="#ffb300"/>
+      <stop offset="100%" stop-color="#e65100"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ground Puddle of Melted Goo -->
+  <ellipse cx="270" cy="450" rx="190" ry="35" fill="url(#puddleGrad)"/>
+  <ellipse cx="330" cy="455" rx="90" ry="20" fill="#f57c00" opacity="0.6"/>
+
+  <!-- Melting Blobby Face Silhouette -->
+  <!-- Top half stays somewhat round, bottom-right droops down in gooey streams -->
+  <path d="M 120 250 
+           C 110 160 180 80 280 80 
+           C 370 80 430 140 430 230 
+           C 430 270 420 300 410 330 
+           C 400 360 415 400 410 440 
+           C 405 455 385 460 370 445 
+           C 355 430 350 395 340 380 
+           C 330 365 315 440 295 455 
+           C 280 465 260 450 255 425 
+           C 250 390 230 395 210 425 
+           C 195 445 175 450 165 430 
+           C 150 400 160 360 140 340 
+           C 125 325 120 290 120 250 Z" 
+        fill="url(#meltGrad)" stroke="#c65100" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- Melt drip highlight reflections -->
+  <path d="M 390 350 Q 405 400 400 435 Q 395 400 385 365 Z" fill="url(#dropHighlight)"/>
+  <path d="M 285 380 Q 290 420 285 445 Q 275 415 275 390 Z" fill="url(#dropHighlight)"/>
+  <path d="M 185 370 Q 185 410 175 425 Q 170 405 175 380 Z" fill="url(#dropHighlight)"/>
+
+  <!-- Straining Sweating Brows -->
+  <path d="M 175 165 Q 215 180 235 190" stroke="#6d3900" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <path d="M 315 195 Q 345 180 380 185" stroke="#6d3900" stroke-width="7" stroke-linecap="round" fill="none"/>
+
+  <!-- Strained / Staring Dead Eyes -->
+  <!-- Left Eye (round and dead) -->
+  <ellipse cx="205" cy="225" rx="24" ry="30" fill="#3e2723"/>
+  <circle cx="212" cy="216" r="8" fill="#ffffff"/>
+  <circle cx="203" cy="235" r="4" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Right Eye (sagging down with the melt) -->
+  <ellipse cx="345" cy="235" rx="26" ry="34" fill="#3e2723" transform="rotate(12 345 235)"/>
+  <circle cx="351" cy="225" r="8" fill="#ffffff"/>
+  <circle cx="343" cy="246" r="4" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Melt drip tearing from right eye -->
+  <path d="M 345 265 Q 352 300 348 320 Q 342 300 340 265 Z" fill="#6d3900" opacity="0.5"/>
+
+  <!-- Strained Forced Smile (skewed and droopy on the right side) -->
+  <path d="M 190 295 
+           Q 240 340 290 325 
+           Q 340 310 370 340 
+           Q 330 355 285 345 
+           Q 230 355 190 295 Z" 
+        fill="#3e2723" stroke="#6d3900" stroke-width="4"/>
+
+  <!-- Sweat drop rolling down side -->
+  <path d="M 140 180 C 130 195 120 215 125 225 C 130 235 145 235 150 225 C 155 215 145 195 140 180 Z" 
+        fill="#4fc3f7" stroke="#0288d1" stroke-width="3"/>
+  <ellipse cx="136" cy="215" rx="3" ry="6" fill="#ffffff" opacity="0.8"/>
+</svg>

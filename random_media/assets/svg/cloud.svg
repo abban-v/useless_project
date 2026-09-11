@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Dark ominous cloud gradient -->
+    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4a4a58"/>
+      <stop offset="60%" stop-color="#23232c"/>
+      <stop offset="100%" stop-color="#121217"/>
+    </linearGradient>
+
+    <!-- Electric glow -->
+    <filter id="lightningGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <radialGradient id="furiousEye" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff0000"/>
+      <stop offset="75%" stop-color="#990000"/>
+      <stop offset="100%" stop-color="#330000"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Crackling Lightning Bolts shooting out bottom -->
+  <!-- Center Main Lightning -->
+  <polygon points="250,290 220,360 255,360 210,460 290,380 250,380 280,310" 
+           fill="#ffee00" stroke="#ff9900" stroke-width="4" filter="url(#lightningGlow)"/>
+  
+  <!-- Left Jagged Lightning -->
+  <polygon points="140,280 115,340 135,340 100,410 150,350 130,350 150,295" 
+           fill="#00ffff" stroke="#0088ff" stroke-width="3" filter="url(#lightningGlow)"/>
+
+  <!-- Right Jagged Lightning -->
+  <polygon points="360,280 390,340 370,340 405,420 355,355 375,355 350,295" 
+           fill="#ff00ff" stroke="#aa00ff" stroke-width="3" filter="url(#lightningGlow)"/>
+
+  <!-- Angry torrential rain streaks -->
+  <line x1="80" y1="330" x2="60" y2="440" stroke="#4fc3f7" stroke-width="4" stroke-dasharray="16,12" stroke-linecap="round"/>
+  <line x1="180" y1="360" x2="165" y2="460" stroke="#4fc3f7" stroke-width="4" stroke-dasharray="20,10" stroke-linecap="round"/>
+  <line x1="320" y1="360" x2="335" y2="460" stroke="#4fc3f7" stroke-width="4" stroke-dasharray="20,10" stroke-linecap="round"/>
+  <line x1="420" y1="330" x2="440" y2="440" stroke="#4fc3f7" stroke-width="4" stroke-dasharray="16,12" stroke-linecap="round"/>
+
+  <!-- Cloud Puff Outline Silhouette -->
+  <!-- Shadow/Border backing -->
+  <path d="M 120 280 
+           A 65 65 0 0 1 110 170 
+           A 85 85 0 0 1 230 110 
+           A 95 95 0 0 1 370 140 
+           A 70 70 0 0 1 420 250 
+           A 60 60 0 0 1 370 320 
+           L 130 320 
+           A 55 55 0 0 1 120 280 Z" 
+        fill="url(#cloudGrad)" stroke="#111116" stroke-width="12" stroke-linejoin="round"/>
+
+  <!-- Internal cloud texture puff highlights -->
+  <path d="M 140 260 A 50 50 0 0 1 135 185 A 65 65 0 0 1 235 135" fill="none" stroke="#68687a" stroke-width="5" opacity="0.6"/>
+  <path d="M 255 135 A 75 75 0 0 1 360 160 A 55 55 0 0 1 400 240" fill="none" stroke="#68687a" stroke-width="5" opacity="0.6"/>
+
+  <!-- Unhinged Angry Brows -->
+  <path d="M 160 175 L 235 210" stroke="#ff0044" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 340 175 L 265 210" stroke="#ff0044" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Glowing Furious Red Eyes with Yellow Pinpoint Pupils -->
+  <!-- Left Eye -->
+  <ellipse cx="205" cy="225" rx="26" ry="32" fill="url(#furiousEye)" stroke="#ffffff" stroke-width="4"/>
+  <circle cx="215" cy="225" r="8" fill="#ffff00"/>
+  <circle cx="217" cy="223" r="3" fill="#ffffff"/>
+  <!-- Blood veins -->
+  <path d="M 185 220 L 198 224 M 188 235 L 200 230" stroke="#ff9999" stroke-width="2"/>
+
+  <!-- Right Eye -->
+  <ellipse cx="295" cy="225" rx="26" ry="32" fill="url(#furiousEye)" stroke="#ffffff" stroke-width="4"/>
+  <circle cx="285" cy="225" r="8" fill="#ffff00"/>
+  <circle cx="283" cy="223" r="3" fill="#ffffff"/>
+  <!-- Blood veins -->
+  <path d="M 315 220 L 302 224 M 312 235 L 300 230" stroke="#ff9999" stroke-width="2"/>
+
+  <!-- Jagged Menacing Snarl Mouth spitting spark -->
+  <path d="M 190 270 Q 250 255 310 270 Q 280 305 250 295 Q 220 305 190 270 Z" 
+        fill="#0a0a0d" stroke="#ff0055" stroke-width="5" stroke-linejoin="round"/>
+  
+  <!-- Cloud teeth -->
+  <polygon points="205,268 215,282 225,268" fill="#ffffff"/>
+  <polygon points="235,267 248,284 260,267" fill="#ffffff"/>
+  <polygon points="272,269 285,282 295,270" fill="#ffffff"/>
+  <!-- Bottom fangs -->
+  <polygon points="220,295 230,282 240,293" fill="#ffffff"/>
+  <polygon points="260,293 270,282 280,295" fill="#ffffff"/>
+
+  <!-- Electric spark spitting from mouth -->
+  <polygon points="248,285 240,300 252,298 245,315 258,303 250,302 258,288" fill="#ffff00"/>
+</svg>

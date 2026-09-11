@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Emoji face with flushed anguish cheeks -->
+    <radialGradient id="agonyFaceGrad" cx="50%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#fff59d"/>
+      <stop offset="45%" stop-color="#ffca28"/>
+      <stop offset="75%" stop-color="#ff8f00"/>
+      <stop offset="100%" stop-color="#d84315"/>
+    </radialGradient>
+
+    <!-- Deep flushed red cheeks -->
+    <radialGradient id="flushCheeks" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff1744" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ff1744" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Tear stream liquid gradient -->
+    <linearGradient id="tearStreamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e1f5fe" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#81d4fa"/>
+      <stop offset="70%" stop-color="#29b6f6"/>
+      <stop offset="100%" stop-color="#0288d1"/>
+    </linearGradient>
+
+    <!-- Tear highlight -->
+    <linearGradient id="tearHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Deep mouth throat abyss -->
+    <radialGradient id="throatAbyss" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#5c0011"/>
+      <stop offset="60%" stop-color="#260005"/>
+      <stop offset="100%" stop-color="#0d0002"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Emoji Face Base -->
+  <circle cx="250" cy="250" r="195" fill="url(#agonyFaceGrad)" stroke="#bf360c" stroke-width="7"/>
+
+  <!-- Flushed hysterical cheeks -->
+  <ellipse cx="140" cy="290" rx="45" ry="32" fill="url(#flushCheeks)"/>
+  <ellipse cx="360" cy="290" rx="45" ry="32" fill="url(#flushCheeks)"/>
+
+  <!-- Nervous cold sweat on forehead -->
+  <path d="M 235 95 C 228 110 220 125 225 135 C 230 145 245 145 250 135 C 255 125 245 110 235 95 Z" fill="#80d8ff" stroke="#0288d1" stroke-width="2"/>
+  <ellipse cx="230" cy="125" rx="3" ry="5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="270" cy="115" r="7" fill="#80d8ff" stroke="#0288d1" stroke-width="2"/>
+
+  <!-- Eyebrows of Utter Anguish & Existential Meltdown (Bent into extreme sad arches) -->
+  <path d="M 125 170 C 150 120 205 135 225 175" stroke="#4e342e" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M 375 170 C 350 120 295 135 275 175" stroke="#4e342e" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <!-- Forehead stress wrinkle crease -->
+  <path d="M 232 175 Q 250 160 268 175" stroke="#795548" stroke-width="4" stroke-linecap="round" fill="none"/>
+
+  <!-- Massive Watery Bloodshot Eyes Drowning in Tears -->
+  <!-- Left Eye Socket & Water Pool -->
+  <ellipse cx="175" cy="215" rx="44" ry="46" fill="#ffffff" stroke="#212121" stroke-width="5"/>
+  <!-- Bloodshot veins in sclera -->
+  <path d="M 140 195 Q 155 205 165 212 M 135 225 Q 150 222 165 220 M 145 242 Q 160 235 170 228" stroke="#ff1744" stroke-width="2" fill="none"/>
+  <path d="M 210 195 Q 195 205 185 212 M 215 225 Q 200 222 185 220 M 205 242 Q 190 235 180 228" stroke="#ff1744" stroke-width="2" fill="none"/>
+  <!-- Giant Glossy Distressed Pupil -->
+  <ellipse cx="175" cy="215" rx="26" ry="28" fill="#1a1a1a"/>
+  <!-- Watery light reflections (The teary anime/meme shimmer) -->
+  <ellipse cx="166" cy="204" rx="11" ry="12" fill="#ffffff"/>
+  <circle cx="186" cy="225" r="6" fill="#ffffff" opacity="0.9"/>
+  <circle cx="170" cy="228" r="3.5" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Right Eye Socket & Water Pool -->
+  <ellipse cx="325" cy="215" rx="44" ry="46" fill="#ffffff" stroke="#212121" stroke-width="5"/>
+  <!-- Bloodshot veins in sclera -->
+  <path d="M 290 195 Q 305 205 315 212 M 285 225 Q 300 222 315 220 M 295 242 Q 310 235 320 228" stroke="#ff1744" stroke-width="2" fill="none"/>
+  <path d="M 360 195 Q 345 205 335 212 M 365 225 Q 350 222 335 220 M 355 242 Q 340 235 330 228" stroke="#ff1744" stroke-width="2" fill="none"/>
+  <!-- Giant Glossy Distressed Pupil -->
+  <ellipse cx="325" cy="215" rx="26" ry="28" fill="#1a1a1a"/>
+  <!-- Watery light reflections -->
+  <ellipse cx="316" cy="204" rx="11" ry="12" fill="#ffffff"/>
+  <circle cx="336" cy="225" r="6" fill="#ffffff" opacity="0.9"/>
+  <circle cx="320" cy="228" r="3.5" fill="#ffffff" opacity="0.8"/>
+
+  <!-- TORRENTIAL TEAR RIVERS OVERFLOWING FROM EYES -->
+  <!-- Left River -->
+  <path d="M 150 245 
+           C 130 280 120 340 135 410 
+           C 145 445 180 440 185 415 
+           C 195 360 195 290 195 255 Z" 
+        fill="url(#tearStreamGrad)" stroke="#01579b" stroke-width="3"/>
+  <path d="M 142 270 Q 135 340 148 400" stroke="url(#tearHighlight)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- Dripping tear drop left -->
+  <ellipse cx="160" cy="445" rx="12" ry="16" fill="#29b6f6" stroke="#01579b" stroke-width="2"/>
+  <ellipse cx="156" cy="440" rx="4" ry="7" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Right River -->
+  <path d="M 305 255 
+           C 305 290 305 360 315 415 
+           C 320 440 355 445 365 410 
+           C 380 340 370 280 350 245 Z" 
+        fill="url(#tearStreamGrad)" stroke="#01579b" stroke-width="3"/>
+  <path d="M 358 270 Q 365 340 352 400" stroke="url(#tearHighlight)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- Dripping tear drop right -->
+  <ellipse cx="340" cy="445" rx="12" ry="16" fill="#29b6f6" stroke="#01579b" stroke-width="2"/>
+  <ellipse cx="336" cy="440" rx="4" ry="7" fill="#ffffff" opacity="0.8"/>
+
+  <!-- HYSTERICAL SCREAMING SMILE-SOB MOUTH (Open in shrieking laughing-crying agony) -->
+  <path d="M 145 305 
+           Q 250 270 355 305 
+           C 365 385 330 425 250 430 
+           C 170 425 135 385 145 305 Z" 
+        fill="url(#throatAbyss)" stroke="#3e2723" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Vibrating Sobbing Tongue -->
+  <path d="M 185 375 
+           Q 250 330 315 375 
+           C 305 425 280 430 250 430 
+           C 220 430 195 425 185 375 Z" 
+        fill="#ff1744" stroke="#c2185b" stroke-width="3"/>
+  <line x1="250" y1="360" x2="250" y2="425" stroke="#ad1457" stroke-width="3"/>
+
+  <!-- Trembling Clenched Teeth Row (Upper) -->
+  <path d="M 158 308 Q 250 285 342 308 L 336 332 Q 250 315 164 332 Z" fill="#ffffff" stroke="#424242" stroke-width="3"/>
+  <!-- Tooth division notches -->
+  <line x1="195" y1="300" x2="195" y2="324" stroke="#555555" stroke-width="2.5"/>
+  <line x1="230" y1="293" x2="230" y2="320" stroke="#555555" stroke-width="2.5"/>
+  <line x1="270" y1="293" x2="270" y2="320" stroke="#555555" stroke-width="2.5"/>
+  <line x1="305" y1="300" x2="305" y2="324" stroke="#555555" stroke-width="2.5"/>
+
+  <!-- Quivering Chin Wrinkles -->
+  <path d="M 225 448 Q 250 456 275 448" stroke="#bf360c" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M 235 460 Q 250 466 265 460" stroke="#bf360c" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+  <!-- Flying tear droplets from head shake -->
+  <circle cx="105" cy="220" r="8" fill="#80d8ff" stroke="#0288d1" stroke-width="2"/>
+  <circle cx="85" cy="250" r="11" fill="#4fc3f7" stroke="#0288d1" stroke-width="2"/>
+  <circle cx="395" cy="220" r="8" fill="#80d8ff" stroke="#0288d1" stroke-width="2"/>
+  <circle cx="415" cy="250" r="11" fill="#4fc3f7" stroke="#0288d1" stroke-width="2"/>
+</svg>

@@ -24,9 +24,10 @@ from config import (
     KEYBOARD_SCRAMBLE_CHANCE,
 )
 from audio_pump import WindowsAudioController, AudioHazardMonitor, PumpOverlay
-from screen_flashbang import HazardManager
+from screen_flashbang import HazardManager, stop_flashbang_audio
 from mouse_stamina import MouseSpeedController, MouseStaminaHUD, attach_input_desktop
 from keyboard_scramble import KeyboardScrambler
+from random_media import MediaChaosManager
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -55,6 +56,7 @@ class UselessApp:
         print(f"  * Visual Hazard:   {int(FLASHBANG_CHANCE * 100)}% chance every {int(HAZARD_INTERVAL_SECONDS)}s -> 100% Brightness Flashbang")
         print(f"  * Mouse Stamina:   Floating HUD above cursor -> Exhaustion freeze & 'ONE MOMENT OF SILENCE'")
         print(f"  * Keyboard Chaos:  {int(KEYBOARD_SCRAMBLE_CHANCE * 100)}% chance of typed letter swapping (e.g. g -> h)")
+        print(f"  * Click Chaos:     60% chance on click -> 500 Bouncing Cats, 50 Spinning Rats, 4 Furbys & Music")
         print(" Safety:")
         print("  * Press [F8] or [Ctrl + Shift + Q] anywhere to EMERGENCY EXIT & RESTORE!")
         print("=" * 60)
@@ -84,13 +86,21 @@ class UselessApp:
             cooldown_seconds=AUDIO_COOLDOWN_SECONDS,
         )
 
-        # 5. Extensible Periodic Visual Hazard Manager (with 100% brightness blast)
-        self.hazard_manager = HazardManager(self.root)
+        # 5. Extensible Periodic Visual Hazard Manager (with 100% brightness blast & loud meme audio)
+        self.hazard_manager = HazardManager(
+            self.root,
+            audio_ctrl=self.audio_ctrl,
+            audio_monitor=self.audio_monitor,
+            pump_overlay=self.pump_overlay,
+        )
 
         # 6. Keyboard Scrambler (40% letter swapping)
         self.keyboard_scrambler = KeyboardScrambler(chance=KEYBOARD_SCRAMBLE_CHANCE)
 
-        # 7. Safety Hotkey Thread
+        # 7. Click Chaos Engine (500 Cats, 50 Rats, 4 Furbys, Music Chaos)
+        self.media_chaos = MediaChaosManager(self.root)
+
+        # 8. Safety Hotkey Thread
         self.is_running = True
         self.hotkey_thread = threading.Thread(target=self._hotkey_listener, daemon=True)
 
@@ -129,6 +139,7 @@ class UselessApp:
         self.audio_monitor.start()
         self.hazard_manager.start()
         self.keyboard_scrambler.start()
+        self.media_chaos.start()
         self.hotkey_thread.start()
 
         try:
@@ -144,6 +155,11 @@ class UselessApp:
         print("\n[UselessApp] Cleaning up and restoring Windows parameters...")
 
         try:
+            self.media_chaos.stop()
+        except Exception:
+            pass
+
+        try:
             self.keyboard_scrambler.stop()
         except Exception:
             pass
@@ -155,6 +171,7 @@ class UselessApp:
 
         try:
             self.hazard_manager.stop()
+            stop_flashbang_audio()
         except Exception:
             pass
 

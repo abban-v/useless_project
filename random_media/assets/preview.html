@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Unhinged Chaos Media Assets - Preview Gallery</title>
+  <style>
+    body {
+      background: #0d0d12;
+      color: #ffffff;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.4rem;
+      color: #ff0055;
+      text-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      text-align: center;
+      color: #8e8e93;
+      margin-bottom: 40px;
+      font-size: 1.05rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #181820;
+      border: 2px solid #2a2a35;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: #ff0055;
+      box-shadow: 0 12px 30px rgba(255,0,85,0.25);
+    }
+    .card.highlight {
+      border-color: #00ffcc;
+      box-shadow: 0 8px 24px rgba(0, 255, 204, 0.2);
+    }
+    .card.highlight:hover {
+      border-color: #00ffcc;
+      box-shadow: 0 12px 30px rgba(0, 255, 204, 0.4);
+    }
+    .tag {
+      font-size: 0.72rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      letter-spacing: 0.8px;
+    }
+    .tag-new {
+      background: rgba(0, 255, 204, 0.15);
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+    }
+    .tag-improved {
+      background: rgba(255, 149, 0, 0.15);
+      color: #ff9500;
+      border: 1px solid #ff9500;
+    }
+    .tag-core {
+      background: rgba(255, 0, 85, 0.15);
+      color: #ff0055;
+      border: 1px solid #ff0055;
+    }
+    .img-wrap {
+      width: 240px;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #111116;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      padding: 10px;
+      overflow: hidden;
+    }
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #f5f5f7;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .desc {
+      font-size: 0.85rem;
+      color: #98989f;
+      text-align: center;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <h1>[!] UNHINGED CHAOS ASSETS PREVIEW [!]</h1>
+  <p class="subtitle">Complete vector asset collection ready for the upcoming Random Media Chaos popup engine</p>
+
+  <div class="grid">
+    <!-- 1. Spinning Low-Poly Rat (NEW) -->
+    <div class="card highlight">
+      <div class="tag tag-new">★ NEW ADDITION</div>
+      <div class="img-wrap"><img src="svg/lowpoly_rat.svg" alt="Spinning Low-Poly Rat"></div>
+      <div class="title">Spinning Low-Poly Rat</div>
+      <div class="desc">Low-poly 3D faceted rat with retrowave cyber aura and continuous CSS keyframe spin.</div>
+    </div>
+
+
+    <!-- 3. Soul-Staring Cursed Furby (NEW) -->
+    <div class="card highlight">
+      <div class="tag tag-new">★ NEW ADDITION</div>
+      <div class="img-wrap"><img src="svg/cursed_furby.svg" alt="Soul-Staring Furby"></div>
+      <div class="title">Soul-Staring Cursed Furby</div>
+      <div class="desc">Molded plastic faceplate with unblinking robotic glass eyes staring into your soul and parted beak.</div>
+    </div>
+
+    <!-- 4. Laughing in Agony (IMPROVED) -->
+    <div class="card">
+      <div class="tag tag-improved">★ RADICALLY IMPROVED</div>
+      <div class="img-wrap"><img src="svg/emoji_crying_agony.svg" alt="Crying Agony Emoji"></div>
+      <div class="title">Laughing In Agony (😭/😂)</div>
+      <div class="desc">Flooded with overflowing tear rivers, glassy distressed pupils, quivering chin, and hysterical scream-laugh jaw.</div>
+    </div>
+
+    <!-- 5. Manic Goblin Cat -->
+    <div class="card">
+      <div class="tag tag-core">CORE ASSET</div>
+      <div class="img-wrap"><img src="svg/cat.svg" alt="Unhinged Cat"></div>
+      <div class="title">Manic Goblin Cat</div>
+      <div class="desc">Bristling spiky fur, arched back, claws, sharp needle teeth, and mismatched glowing dilated eyes.</div>
+    </div>
+
+    <!-- 6. Furious Storm Cloud -->
+    <div class="card">
+      <div class="tag tag-core">CORE ASSET</div>
+      <div class="img-wrap"><img src="svg/cloud.svg" alt="Angry Storm Cloud"></div>
+      <div class="title">Furious Storm Cloud</div>
+      <div class="desc">Ominous thunderstorm cloud blasting lightning bolts, torrential rain, and furious glowing red eyes.</div>
+    </div>
+
+    <!-- 7. Melting Smiley Face -->
+    <div class="card">
+      <div class="tag tag-core">UNHINGED EMOJI</div>
+      <div class="img-wrap"><img src="svg/emoji_melting.svg" alt="Melting Emoji"></div>
+      <div class="title">Melting Smiley (🫠)</div>
+      <div class="desc">Drooping and melting into a puddle of goo with a strained, dead-inside forced smile and sweat drop.</div>
+    </div>
+
+    <!-- 8. Cursed Void Stare -->
+    <div class="card">
+      <div class="tag tag-core">UNHINGED EMOJI</div>
+      <div class="img-wrap"><img src="svg/emoji_void_stare.svg" alt="Void Stare Emoji"></div>
+      <div class="title">Cursed Void Stare</div>
+      <div class="desc">Deep sunken purple eyebags, hyper-dilated bloodshot eyes, pinprick pupils, and shivering clenched teeth.</div>
+    </div>
+
+    <!-- 9. The Vibe Check -->
+    <div class="card">
+      <div class="tag tag-core">UNHINGED EMOJI</div>
+      <div class="img-wrap"><img src="svg/emoji_vibe_check.svg" alt="Vibe Check Emoji"></div>
+      <div class="title">The Vibe Check</div>
+      <div class="desc">Sinister shaded emoji with a giant 3D foreshortened hand reaching directly out of the screen.</div>
+    </div>
+
+    <!-- 10. Laser Beam Skull -->
+    <div class="card">
+      <div class="tag tag-core">UNHINGED EMOJI</div>
+      <div class="img-wrap"><img src="svg/emoji_cursed_skull.svg" alt="Laser Skull Emoji"></div>
+      <div class="title">Laser Beam Skull (💀)</div>
+      <div class="desc">Skull with dual high-intensity red laser beams firing forward from hollow eye sockets and sharp grin.</div>
+    </div>
+
+    <!-- 11. Gigachad Moai -->
+    <div class="card">
+      <div class="tag tag-core">UNHINGED EMOJI</div>
+      <div class="img-wrap"><img src="svg/emoji_gigachad_moai.svg" alt="Gigachad Moai Emoji"></div>
+      <div class="title">Gigachad Moai (🗿)</div>
+      <div class="desc">Chiseled angular jawline, vine boom shockwave aura, and unhinged sigma stare.</div>
+    </div>
+  </div>
+</body>
+</html>

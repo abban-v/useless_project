@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Creepy face gradient with slight toxic tinge -->
+    <radialGradient id="voidSkin" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#fff59d"/>
+      <stop offset="60%" stop-color="#fbc02d"/>
+      <stop offset="90%" stop-color="#f57f17"/>
+      <stop offset="100%" stop-color="#af4448"/>
+    </radialGradient>
+
+    <!-- Deep psychotic eyebags shadow -->
+    <radialGradient id="eyeBagGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4a148c" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#311b92" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Eyeball 3D sphere gradient -->
+    <radialGradient id="eyeballSphere" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#f0f0f5"/>
+      <stop offset="95%" stop-color="#d1d1e0"/>
+      <stop offset="100%" stop-color="#9e9eb0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Emoji Face Base -->
+  <circle cx="250" cy="250" r="195" fill="url(#voidSkin)" stroke="#b26a00" stroke-width="6"/>
+
+  <!-- Sunken psychotic dark circles / eyebags -->
+  <ellipse cx="180" cy="225" rx="68" ry="60" fill="url(#eyeBagGrad)"/>
+  <ellipse cx="320" cy="225" rx="68" ry="60" fill="url(#eyeBagGrad)"/>
+
+  <!-- Wrinkle lines under eyes -->
+  <path d="M 130 265 Q 180 290 225 265" stroke="#5d4037" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M 140 280 Q 180 300 215 280" stroke="#5d4037" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <path d="M 275 265 Q 320 290 370 265" stroke="#5d4037" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M 285 280 Q 320 300 360 280" stroke="#5d4037" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Trembling strained eyebrows -->
+  <path d="M 130 145 Q 170 125 215 140" stroke="#3e2723" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M 285 140 Q 330 125 370 145" stroke="#3e2723" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+  <!-- GIANT BULGING STARE EYEBALLS -->
+  <!-- Left Eyeball -->
+  <circle cx="180" cy="210" r="54" fill="url(#eyeballSphere)" stroke="#263238" stroke-width="5"/>
+  <!-- Crazy bloodshot veins left eye -->
+  <path d="M 135 185 Q 155 195 165 205 M 130 215 Q 150 212 165 212 M 140 235 Q 155 225 168 218" 
+        stroke="#d50000" stroke-width="2.5" fill="none"/>
+  <path d="M 225 185 Q 210 195 195 205 M 230 215 Q 210 215 195 213 M 220 235 Q 205 225 192 218" 
+        stroke="#d50000" stroke-width="2.5" fill="none"/>
+  <!-- Dilated / Pinprick psychotic pupil Left -->
+  <circle cx="180" cy="210" r="14" fill="#000000"/>
+  <circle cx="176" cy="206" r="4" fill="#ffffff"/>
+
+  <!-- Right Eyeball -->
+  <circle cx="320" cy="210" r="54" fill="url(#eyeballSphere)" stroke="#263238" stroke-width="5"/>
+  <!-- Crazy bloodshot veins right eye -->
+  <path d="M 275 185 Q 295 195 305 205 M 270 215 Q 290 212 305 212 M 280 235 Q 295 225 308 218" 
+        stroke="#d50000" stroke-width="2.5" fill="none"/>
+  <path d="M 365 185 Q 350 195 335 205 M 370 215 Q 350 215 335 213 M 360 235 Q 345 225 332 218" 
+        stroke="#d50000" stroke-width="2.5" fill="none"/>
+  <!-- Dilated / Pinprick psychotic pupil Right -->
+  <circle cx="320" cy="210" r="14" fill="#000000"/>
+  <circle cx="316" cy="206" r="4" fill="#ffffff"/>
+
+  <!-- Nervous Sweat Beads on Brow -->
+  <path d="M 245 130 C 240 140 235 152 238 158 C 242 165 254 165 258 158 C 262 152 255 140 245 130 Z" 
+        fill="#80d8ff" stroke="#0091ea" stroke-width="2"/>
+  <circle cx="270" cy="155" r="5" fill="#80d8ff" stroke="#0091ea" stroke-width="1.5"/>
+
+  <!-- Terrified / Manic Clenched Teeth Grin -->
+  <path d="M 160 330 Q 250 315 340 330 Q 330 395 250 400 Q 170 395 160 330 Z" 
+        fill="#3e2723" stroke="#212121" stroke-width="6" stroke-linejoin="round"/>
+  
+  <!-- Clenched individual teeth lines -->
+  <path d="M 165 355 Q 250 350 335 355" stroke="#212121" stroke-width="4"/>
+  <!-- Vertical teeth gaps -->
+  <line x1="185" y1="332" x2="185" y2="378" stroke="#212121" stroke-width="3"/>
+  <line x1="210" y1="327" x2="210" y2="385" stroke="#212121" stroke-width="3"/>
+  <line x1="235" y1="324" x2="235" y2="390" stroke="#212121" stroke-width="3"/>
+  <line x1="265" y1="324" x2="265" y2="390" stroke="#212121" stroke-width="3"/>
+  <line x1="290" y1="327" x2="290" y2="385" stroke="#212121" stroke-width="3"/>
+  <line x1="315" y1="332" x2="315" y2="378" stroke="#212121" stroke-width="3"/>
+
+  <!-- Teeth fill (individual teeth blocks) -->
+  <!-- Top Teeth -->
+  <rect x="190" y="330" width="16" height="22" rx="3" fill="#ffffff"/>
+  <rect x="215" y="327" width="16" height="25" rx="3" fill="#ffffff"/>
+  <rect x="240" y="325" width="20" height="27" rx="3" fill="#ffffff"/>
+  <rect x="270" y="327" width="16" height="25" rx="3" fill="#ffffff"/>
+  <rect x="295" y="330" width="16" height="22" rx="3" fill="#ffffff"/>
+  <!-- Bottom Teeth -->
+  <rect x="190" y="358" width="16" height="22" rx="3" fill="#fff9c4"/>
+  <rect x="215" y="358" width="16" height="26" rx="3" fill="#fff9c4"/>
+  <rect x="240" y="358" width="20" height="28" rx="3" fill="#fff9c4"/>
+  <rect x="270" y="358" width="16" height="26" rx="3" fill="#fff9c4"/>
+  <rect x="295" y="358" width="16" height="22" rx="3" fill="#fff9c4"/>
+</svg>

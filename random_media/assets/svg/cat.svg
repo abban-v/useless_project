@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Background glow for chaos -->
+    <radialGradient id="catAura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff0055" stop-opacity="0.4"/>
+      <stop offset="70%" stop-color="#9900ff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="eyeGlowLeft" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffff00"/>
+      <stop offset="60%" stop-color="#00ff66"/>
+      <stop offset="100%" stop-color="#006622"/>
+    </radialGradient>
+    <radialGradient id="eyeGlowRight" cx="45%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#ff3300"/>
+      <stop offset="70%" stop-color="#ffcc00"/>
+      <stop offset="100%" stop-color="#990000"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Chaos aura -->
+  <circle cx="250" cy="250" r="230" fill="url(#catAura)"/>
+
+  <!-- Manic cat tail (frizzed out zigzag) -->
+  <path d="M 120 340 Q 60 260 90 180 T 50 100 Q 80 80 100 130 T 120 230 Q 150 300 140 360 Z"
+        fill="#1a1a1a" stroke="#ff0055" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Back arched body with bristled fur spikes -->
+  <path d="M 130 380 
+           L 150 310 L 140 300 L 170 240 L 160 235 L 200 180 L 195 175 L 240 150 
+           L 290 170 L 330 220 L 320 230 L 350 280 L 340 300 L 370 380 
+           C 360 410 320 420 250 420 C 180 420 140 410 130 380 Z" 
+        fill="#111113" stroke="#ff3366" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Spiky back fur tufts -->
+  <polygon points="180,190 190,140 210,180" fill="#222226" stroke="#ff0055" stroke-width="2"/>
+  <polygon points="220,165 240,115 255,160" fill="#222226" stroke="#ff0055" stroke-width="2"/>
+  <polygon points="265,165 285,125 295,175" fill="#222226" stroke="#ff0055" stroke-width="2"/>
+
+  <!-- Cat Paws (tense and clutching) -->
+  <ellipse cx="170" cy="400" rx="35" ry="20" fill="#1c1c1f" stroke="#ff0055" stroke-width="3"/>
+  <ellipse cx="330" cy="400" rx="35" ry="20" fill="#1c1c1f" stroke="#ff0055" stroke-width="3"/>
+  <!-- Claws -->
+  <path d="M 145 400 L 140 425 M 165 405 L 165 430 M 185 400 L 190 425" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 310 400 L 305 425 M 330 405 L 330 430 M 350 400 L 355 425" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Large goblin head -->
+  <circle cx="250" cy="250" r="105" fill="#18181c" stroke="#ff0055" stroke-width="5"/>
+
+  <!-- Giant jagged ears -->
+  <!-- Left Ear -->
+  <polygon points="160,200 110,70 210,160" fill="#18181c" stroke="#ff0055" stroke-width="5" stroke-linejoin="round"/>
+  <polygon points="155,185 125,95 195,160" fill="#ff0055" opacity="0.7"/>
+  <!-- Right Ear -->
+  <polygon points="340,200 390,70 290,160" fill="#18181c" stroke="#ff0055" stroke-width="5" stroke-linejoin="round"/>
+  <polygon points="345,185 375,95 305,160" fill="#ff0055" opacity="0.7"/>
+
+  <!-- Unhinged Asymmetric Eyes -->
+  <!-- Left Eye: Gigantic, Dilated green-yellow orb -->
+  <ellipse cx="205" cy="235" rx="42" ry="46" fill="url(#eyeGlowLeft)" stroke="#ffffff" stroke-width="4"/>
+  <!-- Crazy tiny pinprick pupil floating weirdly -->
+  <circle cx="200" cy="230" r="12" fill="#000000"/>
+  <circle cx="204" cy="226" r="4" fill="#ffffff"/>
+  <!-- Bloodshot veins left eye -->
+  <path d="M 170 225 Q 185 230 190 232 M 175 250 Q 188 245 193 240 M 230 215 Q 220 225 214 228" 
+        stroke="#ff0000" stroke-width="2" fill="none" opacity="0.8"/>
+
+  <!-- Right Eye: Manic, spiral red-orange hypnotic orb -->
+  <ellipse cx="295" cy="235" rx="38" ry="44" fill="url(#eyeGlowRight)" stroke="#ffffff" stroke-width="4"/>
+  <!-- Slit pupil pointing completely wrong direction -->
+  <ellipse cx="292" cy="235" rx="6" ry="24" fill="#000000" transform="rotate(-18 292 235)"/>
+  <circle cx="298" cy="225" r="5" fill="#ffffff"/>
+  <!-- Bloodshot veins right eye -->
+  <path d="M 325 220 Q 310 228 302 232 M 325 245 Q 312 240 304 238 M 270 230 Q 280 232 288 235" 
+        stroke="#ff0033" stroke-width="2" fill="none" opacity="0.8"/>
+
+  <!-- Deranged wide open toothy grin mouth -->
+  <path d="M 180 285 Q 250 360 320 285 Q 250 315 180 285 Z" fill="#4d0011" stroke="#ff0055" stroke-width="4"/>
+  
+  <!-- Needle sharp chaotic teeth -->
+  <!-- Top row -->
+  <polygon points="195,290 205,308 215,293" fill="#ffffff"/>
+  <polygon points="215,293 228,312 240,296" fill="#ffffff"/>
+  <polygon points="240,296 252,315 264,296" fill="#ffffff"/>
+  <polygon points="264,296 278,312 290,293" fill="#ffffff"/>
+  <polygon points="290,293 300,306 310,288" fill="#ffffff"/>
+  <!-- Bottom row -->
+  <polygon points="205,320 215,302 225,317" fill="#ffffff"/>
+  <polygon points="235,325 248,305 260,325" fill="#ffffff"/>
+  <polygon points="270,320 282,304 295,316" fill="#ffffff"/>
+
+  <!-- Wild jagged whiskers vibrating into space -->
+  <!-- Left Whiskers -->
+  <path d="M 170 265 L 70 235 M 165 275 L 55 280 M 168 285 L 80 325" stroke="#ffff00" stroke-width="3" stroke-linecap="round"/>
+  <!-- Right Whiskers -->
+  <path d="M 330 265 L 430 235 M 335 275 L 445 280 M 332 285 L 420 325" stroke="#ffff00" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Tiny chaotic pink nose -->
+  <polygon points="243,275 257,275 250,284" fill="#ff3399"/>
+</svg>

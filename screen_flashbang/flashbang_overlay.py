@@ -34,6 +34,12 @@ class FlashbangOverlay(tk.Toplevel):
         )
         self.canvas.pack(fill="both", expand=True)
 
+        # Swallow clicks and keypresses on the white screen
+        self.bind("<KeyPress>", lambda e: "break")
+        self.canvas.bind("<KeyPress>", lambda e: "break")
+        self.bind("<Button-1>", lambda e: "break")
+        self.canvas.bind("<Button-1>", lambda e: "break")
+
         self.current_alpha = 1.0
         self.fade_steps = int(FLASHBANG_FADE_SECONDS * 33)  # ~30 FPS fade
         self.alpha_step = 1.0 / max(1, self.fade_steps)

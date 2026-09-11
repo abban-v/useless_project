@@ -1,17 +1,22 @@
 """
 Extensible Periodic Visual Hazard Manager for Screen Flashbang Module.
 Checks every minute (60s) for a 60% chance to trigger an active visual hazard.
-Before triggering the flashbang, forces the display brightness to 100% and keeps it there.
-Easily extensible for future pranks.
+When the flashbang triggers:
+- Display brightness is forced to 100% and kept there
+- If volume is below 100%, it is boosted to 100%
+- Plays 'memes/audioloud.mp3'
+- Spawns the blinding white screen overlay with smooth fadeout
 """
 
 import random
 import tkinter as tk
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from config import HAZARD_INTERVAL_SECONDS, FLASHBANG_CHANCE
 from screen_flashbang.flashbang_overlay import FlashbangOverlay
 from screen_flashbang.brightness_controller import force_maximum_brightness
+from screen_flashbang.audio_player import play_flashbang_audio
+from screen_flashbang.action_key_blocker import FlashbangActionKeyBlocker
 
 
 class HazardManager:
@@ -20,9 +25,23 @@ class HazardManager:
     Checks every minute (60s) for a 60% chance to trigger an active hazard.
     """
 
-    def __init__(self, root: tk.Tk):
+    def __init__(self, root: tk.Tk, audio_ctrl=None, audio_monitor=None, pump_overlay=None):
         self.root = root
+        self.audio_ctrl = audio_ctrl
+        self.audio_monitor = audio_monitor
+        self.pump_overlay = pump_overlay
         self.is_running = False
+
+        # Lazy load audio_ctrl if not provided
+        if self.audio_ctrl is None:
+            try:
+                from audio_pump.audio_controller import WindowsAudioController
+                self.audio_ctrl = WindowsAudioController()
+            except Exception:
+                pass
+
+        # Action key & volume lock blocker active during flashbang audio
+        self.key_blocker = FlashbangActionKeyBlocker(self.audio_ctrl)
 
         # Registry of hazard triggering functions for easy future extension
         self.hazard_registry: List[Callable[[], None]] = [
@@ -38,6 +57,8 @@ class HazardManager:
 
     def stop(self):
         self.is_running = False
+        if hasattr(self, "key_blocker"):
+            self.key_blocker.stop()
 
     def register_hazard(self, hazard_func: Callable[[], None]):
         """Allows registering future hazards into the pool."""
@@ -65,14 +86,43 @@ class HazardManager:
 
     def trigger_flashbang(self):
         """
-        Sets display brightness to 100% first, then spawns the screen flashbang effect.
-        Brightness is left at 100% permanently.
+        1. Suppresses audio monitor so meme audio does NOT trigger audio pump drops.
+        2. Sets display brightness to 100% and keeps it there.
+        3. Sets master volume to 100% and unmutes it.
+        4. Blocks action keys and enforces 100% volume against lowering attempts.
+        5. Plays 'memes/audioloud.mp3'.
+        6. Spawns the blinding white screen overlay.
         """
         try:
-            # 1. Force display brightness to 100%
+            # 1. Suppress audio monitor and dismiss any active pump minigame
+            if self.audio_monitor is not None:
+                self.audio_monitor.suppress_for(14.0)
+                self.audio_monitor.dismiss_hazard()
+            if self.pump_overlay is not None:
+                self.pump_overlay.dismiss()
+
+            # 2. Force display brightness to 100%
             force_maximum_brightness()
 
-            # 2. Spawn blinding white flashbang overlay
+            # 3. Boost volume to 100% and ensure unmuted
+            if self.audio_ctrl is not None:
+                try:
+                    self.audio_ctrl.set_mute(False)
+                    cur_vol = self.audio_ctrl.get_volume()
+                    if cur_vol < 1.0:
+                        print(f"[HazardManager] Volume was {cur_vol * 100:.0f}%, boosting to 100%!")
+                        self.audio_ctrl.set_volume(1.0)
+                except Exception as vol_err:
+                    print(f"[HazardManager] Volume boost error: {vol_err}")
+
+            # 4. Block action keys and clamp volume at 100% so user cannot lower it
+            if hasattr(self, "key_blocker"):
+                self.key_blocker.start()
+
+            # 5. Play memes/audioloud.mp3 (loud meme audio)
+            play_flashbang_audio()
+
+            # 6. Spawn blinding white flashbang overlay
             FlashbangOverlay(self.root)
         except Exception as err:
             print(f"[HazardManager] Error spawning flashbang: {err}")

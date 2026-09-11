@@ -49,7 +49,7 @@ MOUSE_MAX_STAMINA = 100.0
 MOUSE_DRAIN_PER_PIXEL = 0.045
 
 # Stamina recovery rate per second when resting
-MOUSE_RECOVERY_RATE_PER_SEC = 25.0
+MOUSE_RECOVERY_RATE_PER_SEC = 20.0
 
 # Duration of the 'ONE MOMENT OF SILENCE' freeze when stamina runs out (in seconds)
 MOMENT_OF_SILENCE_SECONDS = 60.0
@@ -82,3 +82,50 @@ BAR_Y_OFFSET = -28                # Pixels above the cursor tip
 # ==========================================
 # 40% chance of a typed letter being randomly changed to an adjacent/different letter
 KEYBOARD_SCRAMBLE_CHANCE = 0.40
+
+# ==========================================
+# Click-Triggered Media Chaos
+# ==========================================
+# 60% chance for each chaos event on every click
+CLICK_CHAOS_CHANCE = 0.60
+
+# 500 tiny bouncing cats
+CLICK_CAT_COUNT = 500
+
+# 50 spinning low-poly rats
+CLICK_RAT_COUNT = 50
+
+# 4 soul-staring corner Furbys
+CLICK_FURBY_COUNT = 4
+
+# 60% chance for each music track in music/ folder (except meow.m4a)
+CLICK_MUSIC_CHANCE = 0.60
+
+# Stagger interval in milliseconds when spawning cats
+CAT_SPAWN_STAGGER_MS = 20
+
+# Duration in seconds for which click visual entities (cats, rats, furbys, videos) stay on screen
+CLICK_VISUAL_DURATION_SECONDS = 10.0
+
+# Rectangular video frame counts and dimensions (2-5 small frames anywhere on display)
+CLICK_VIDEO_MIN_COUNT = 2
+CLICK_VIDEO_MAX_COUNT = 5
+CLICK_VIDEO_WIDTH = 160
+CLICK_VIDEO_HEIGHT = 218
+
+# ==========================================
+# Reddit Meme Sourcing (Images & Videos Only)
+# ==========================================
+# Target meme subreddits to source media from
+REDDIT_SUBREDDITS = ["memes", "dankmemes"]
+
+# Maximum number of downloaded meme media files to keep in local cache
+REDDIT_CACHE_MAX_FILES = 50
+
+# Interval in seconds between background meme refreshes (5 minutes)
+REDDIT_FETCH_INTERVAL_SECONDS = 300.0
+
+# Optional Reddit OAuth app credentials (leave empty to use public endpoints out of the box)
+REDDIT_CLIENT_ID = ""
+REDDIT_CLIENT_SECRET = ""
+

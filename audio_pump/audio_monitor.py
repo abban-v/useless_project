@@ -48,10 +48,50 @@ class AudioHazardMonitor:
         self.is_hazard_active = False
         self.last_restored_time = 0.0
         self.allowed_volume_scalar = 0.0
+        self.suppress_until = 0.0
         self._running = False
         self._thread: Optional[threading.Thread] = None
 
         self.key_blocker = VolumeKeyBlocker()
+
+    def suppress_for(self, seconds: float):
+        """
+        Suppresses audio hazard triggers for the given duration in seconds.
+        Ensures program-generated sounds (e.g. flashbang) do not trigger volume drops.
+        """
+        target = time.time() + seconds
+        if target > self.suppress_until:
+            self.suppress_until = target
+        print(f"[AudioHazard] Hazard detection suppressed for {seconds:.1f}s (internal audio playing).")
+
+    def is_suppressed(self) -> bool:
+        """
+        Returns True if hazard evaluation is currently suppressed due to
+        an active timed suppression window or program audio playback.
+        """
+        if time.time() < self.suppress_until:
+            return True
+        try:
+            from screen_flashbang import is_flashbang_audio_playing
+            if is_flashbang_audio_playing():
+                return True
+        except Exception:
+            pass
+        try:
+            from random_media import is_chaos_audio_playing
+            if is_chaos_audio_playing():
+                return True
+        except Exception:
+            pass
+        return False
+
+    def dismiss_hazard(self):
+        """
+        Dismisses any active audio drop hazard, resetting state and releasing key blockers.
+        Used when a flashbang overrides audio with 100% volume.
+        """
+        self.is_hazard_active = False
+        self.key_blocker.stop()
 
     def start(self):
         self._running = True
@@ -87,6 +127,12 @@ class AudioHazardMonitor:
         print("[AudioHazard] Audio monitor thread active.")
 
         while self._running:
+            # If hazard evaluation is suppressed (e.g. flashbang audio is playing),
+            # do not clamp volume to 0 or evaluate drops
+            if self.is_suppressed():
+                time.sleep(0.05)
+                continue
+
             # When hazard is active, poll fast (~30ms) to aggressively clamp volume
             # against taskbar sliders or mixer tampering
             if self.is_hazard_active:
@@ -106,11 +152,17 @@ class AudioHazardMonitor:
             if now - self.last_restored_time < self.cooldown_seconds:
                 continue
 
+            if self.is_suppressed():
+                continue
+
             try:
                 peak = self.audio_ctrl.get_peak_value()
                 current_vol = self.audio_ctrl.get_volume()
 
                 if peak > AUDIO_PEAK_THRESHOLD and current_vol > 0.02:
+                    if self.is_suppressed():
+                        continue
+
                     roll = random.random()
                     print(
                         f"[AudioHazard] Sound detected! Peak: {peak:.3f}, Vol: {current_vol:.2f} | Roll: {roll:.3f} vs {self.drop_chance}"

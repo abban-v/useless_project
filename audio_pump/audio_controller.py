@@ -44,6 +44,7 @@ class WindowsAudioController:
         self._init_com_interfaces()
         self._lock = threading.Lock()
         self._original_volume = self.get_volume()
+        self._original_mute = self.get_mute()
 
     def _init_com_interfaces(self):
         # 1. Create MMDeviceEnumerator
@@ -117,6 +118,14 @@ class WindowsAudioController:
             HRESULT, c_void_p, ctypes.POINTER(c_float)
         )(vtable_vol[9])
 
+        # Bind Mute methods (vtable index 14 & 15)
+        self._set_mute = WINFUNCTYPE(
+            HRESULT, c_void_p, wintypes.BOOL, c_void_p
+        )(vtable_vol[14])
+        self._get_mute = WINFUNCTYPE(
+            HRESULT, c_void_p, ctypes.POINTER(wintypes.BOOL)
+        )(vtable_vol[15])
+
         # Bind Meter methods
         vtable_meter = ctypes.cast(
             ctypes.cast(self.p_audio_meter, ctypes.POINTER(c_void_p)).contents,
@@ -139,6 +148,18 @@ class WindowsAudioController:
         with self._lock:
             self._set_master_vol(self.p_endpoint_volume, c_float(clamped), None)
 
+    def get_mute(self) -> bool:
+        """Returns True if master volume is currently muted."""
+        muted = wintypes.BOOL()
+        with self._lock:
+            self._get_mute(self.p_endpoint_volume, byref(muted))
+        return bool(muted.value)
+
+    def set_mute(self, is_muted: bool):
+        """Sets master volume mute state."""
+        with self._lock:
+            self._set_mute(self.p_endpoint_volume, wintypes.BOOL(is_muted), None)
+
     def get_peak_value(self) -> float:
         """Returns peak audio meter value between 0.0 and 1.0."""
         peak = c_float()
@@ -147,5 +168,7 @@ class WindowsAudioController:
         return float(peak.value)
 
     def restore_original_volume(self):
-        """Restores volume back to pre-launch state."""
+        """Restores volume and mute state back to pre-launch state."""
         self.set_volume(self._original_volume)
+        if hasattr(self, "_original_mute"):
+            self.set_mute(self._original_mute)

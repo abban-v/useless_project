@@ -265,3 +265,7 @@ class PumpOverlay(tk.Toplevel):
     def _dismiss(self):
         self.is_active = False
         self.withdraw()
+
+    def dismiss(self):
+        """Immediately closes and resets the pump overlay."""
+        self._dismiss()

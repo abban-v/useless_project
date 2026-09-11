@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Dark ominous background radial -->
+    <radialGradient id="vibeBg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2a0000"/>
+      <stop offset="60%" stop-color="#0d0005"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+
+    <!-- Sinister shaded emoji face -->
+    <radialGradient id="vibeFace" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffe082"/>
+      <stop offset="50%" stop-color="#ffb300"/>
+      <stop offset="85%" stop-color="#b71c1c"/>
+      <stop offset="100%" stop-color="#3e0000"/>
+    </radialGradient>
+
+    <!-- Giant Reaching Hand Gradient -->
+    <linearGradient id="handGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff176"/>
+      <stop offset="40%" stop-color="#fbc02d"/>
+      <stop offset="80%" stop-color="#f57f17"/>
+      <stop offset="100%" stop-color="#bf360c"/>
+    </linearGradient>
+
+    <radialGradient id="palmGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.4"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Dark void backdrop -->
+  <rect width="500" height="500" rx="30" fill="url(#vibeBg)"/>
+
+  <!-- Glowing Menacing Face in Background -->
+  <circle cx="210" cy="180" r="130" fill="url(#vibeFace)" stroke="#ff3d00" stroke-width="4"/>
+
+  <!-- Sinister Pit Eyes (Black Voids with pinpoint red fire) -->
+  <ellipse cx="165" cy="160" rx="20" ry="26" fill="#050002" stroke="#ff1744" stroke-width="2"/>
+  <circle cx="165" cy="162" r="5" fill="#ff1744"/>
+  <circle cx="167" cy="160" r="2" fill="#ffffff"/>
+
+  <ellipse cx="245" cy="160" rx="20" ry="26" fill="#050002" stroke="#ff1744" stroke-width="2"/>
+  <circle cx="245" cy="162" r="5" fill="#ff1744"/>
+  <circle cx="247" cy="160" r="2" fill="#ffffff"/>
+
+  <!-- Sinister Creepy Smug Grin -->
+  <path d="M 155 220 Q 205 270 260 215 Q 210 240 155 220 Z" fill="#050002" stroke="#d50000" stroke-width="3"/>
+
+  <!-- SPEED / SHOCK LINES (Zoom effect toward user) -->
+  <line x1="210" y1="180" x2="350" y2="330" stroke="#ff5722" stroke-width="3" stroke-dasharray="10,15" opacity="0.6"/>
+  <line x1="260" y1="210" x2="440" y2="280" stroke="#ff5722" stroke-width="2" stroke-dasharray="8,12" opacity="0.6"/>
+  <line x1="160" y1="230" x2="190" y2="440" stroke="#ff5722" stroke-width="2" stroke-dasharray="8,12" opacity="0.6"/>
+
+  <!-- GIANT FORESHORTENED HAND REACHING OUT OF SCREEN (The "VIBE CHECK") -->
+  <!-- Hand Shadow behind palm -->
+  <ellipse cx="320" cy="355" rx="125" ry="110" fill="#000000" opacity="0.75" filter="blur(8px)"/>
+
+  <!-- Forearm connecting to body -->
+  <path d="M 270 260 L 320 330 L 250 360 L 220 280 Z" fill="#e65100" stroke="#bf360c" stroke-width="4"/>
+
+  <!-- Palm of Hand -->
+  <path d="M 240 370 
+           C 220 330 250 280 320 270 
+           C 390 260 440 310 445 370 
+           C 450 420 410 460 340 465 
+           C 270 470 245 420 240 370 Z" 
+        fill="url(#handGrad)" stroke="#3e0000" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Palm center creases & depth -->
+  <path d="M 280 330 Q 320 370 370 340" stroke="#bf360c" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M 310 365 Q 340 410 390 400" stroke="#bf360c" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+  <!-- Fingers Reaching Forward (Bulbous foreshortened finger tips) -->
+  <!-- Thumb (left side) -->
+  <path d="M 230 330 C 190 320 175 350 185 385 C 195 410 230 405 245 385 Z" 
+        fill="url(#handGrad)" stroke="#3e0000" stroke-width="7"/>
+  <ellipse cx="205" cy="355" rx="15" ry="18" fill="url(#palmGlow)"/>
+
+  <!-- Index Finger (top-left) -->
+  <path d="M 255 285 C 230 230 270 195 305 210 C 335 225 325 275 295 295 Z" 
+        fill="url(#handGrad)" stroke="#3e0000" stroke-width="7"/>
+  <ellipse cx="280" cy="235" rx="18" ry="22" fill="url(#palmGlow)"/>
+
+  <!-- Middle Finger (top-center, largest) -->
+  <path d="M 315 265 C 320 190 365 170 395 195 C 420 220 395 280 360 285 Z" 
+        fill="url(#handGrad)" stroke="#3e0000" stroke-width="7"/>
+  <ellipse cx="365" cy="215" rx="20" ry="24" fill="url(#palmGlow)"/>
+
+  <!-- Ring Finger (top-right) -->
+  <path d="M 380 275 C 410 220 455 225 465 260 C 475 295 440 330 405 315 Z" 
+        fill="url(#handGrad)" stroke="#3e0000" stroke-width="7"/>
+  <ellipse cx="440" cy="255" rx="18" ry="20" fill="url(#palmGlow)"/>
+
+  <!-- Pinky Finger (bottom-right) -->
+  <path d="M 425 330 C 465 305 490 335 485 370 C 480 400 440 405 420 375 Z" 
+        fill="url(#handGrad)" stroke="#3e0000" stroke-width="7"/>
+  <ellipse cx="460" cy="345" rx="14" ry="16" fill="url(#palmGlow)"/>
+
+  <!-- "VIBE CHECK" TEXT (Distorted horror aesthetic) -->
+  <text x="250" y="70" font-family="'Impact', 'Arial Black', sans-serif" font-size="42" font-weight="bold" 
+        fill="#ff1744" text-anchor="middle" letter-spacing="4" stroke="#000000" stroke-width="2">
+    YOUR VIBE: FAILED
+  </text>
+</svg>

@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Background retro grid aura -->
+    <radialGradient id="cyberGrid" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ffcc" stop-opacity="0.3"/>
+      <stop offset="60%" stop-color="#ff00ff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Low Poly Rat Facet Color Gradients / Lighting -->
+    <linearGradient id="facetLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b0b0b8"/>
+      <stop offset="100%" stop-color="#80808a"/>
+    </linearGradient>
+
+    <linearGradient id="facetMid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#70707a"/>
+      <stop offset="100%" stop-color="#4a4a52"/>
+    </linearGradient>
+
+    <linearGradient id="facetDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3c3c44"/>
+      <stop offset="100%" stop-color="#24242a"/>
+    </linearGradient>
+
+    <linearGradient id="facetPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8da1"/>
+      <stop offset="100%" stop-color="#c2185b"/>
+    </linearGradient>
+
+    <linearGradient id="tailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8da1"/>
+      <stop offset="50%" stop-color="#e91e63"/>
+      <stop offset="100%" stop-color="#880e4f"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    @keyframes spinRat {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(90deg) scale(1.05); }
+      50% { transform: rotate(180deg) scale(1); }
+      75% { transform: rotate(270deg) scale(1.05); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    .spinning-rat-group {
+      transform-origin: 250px 250px;
+      animation: spinRat 3s linear infinite;
+    }
+  </style>
+
+  <!-- Cybernetic backdrop circle -->
+  <circle cx="250" cy="250" r="230" fill="url(#cyberGrid)"/>
+
+  <!-- Rotating Low-Poly Rat Container -->
+  <g class="spinning-rat-group">
+    
+    <!-- Long segmented low-poly tail curling back -->
+    <polygon points="350,280 400,270 410,290 350,300" fill="url(#tailGrad)" stroke="#ff4081" stroke-width="1.5"/>
+    <polygon points="400,270 440,240 450,255 410,290" fill="url(#tailGrad)" stroke="#ff4081" stroke-width="1.5"/>
+    <polygon points="440,240 470,180 480,190 450,255" fill="url(#tailGrad)" stroke="#ff4081" stroke-width="1.5"/>
+    <polygon points="470,180 455,130 468,135 480,190" fill="url(#tailGrad)" stroke="#ff4081" stroke-width="1.5"/>
+    <polygon points="455,130 420,100 425,115 468,135" fill="url(#tailGrad)" stroke="#ff4081" stroke-width="1.5"/>
+
+    <!-- Low-Poly Body Facets (Triangles and Polygons) -->
+    <!-- Lower body / belly -->
+    <polygon points="210,310 280,330 350,290 280,270" fill="url(#facetDark)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="140,270 210,310 280,270 190,240" fill="url(#facetMid)" stroke="#111115" stroke-width="1.5"/>
+    
+    <!-- Flank & Back Quads -->
+    <polygon points="190,240 280,270 350,230 270,190" fill="url(#facetMid)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="280,270 350,290 370,250 350,230" fill="url(#facetDark)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="270,190 350,230 360,180 290,160" fill="url(#facetLight)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="190,240 270,190 220,170 160,200" fill="url(#facetLight)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="220,170 290,160 270,140 210,145" fill="url(#facetLight)" stroke="#111115" stroke-width="1.5"/>
+
+    <!-- Low-Poly Head & Snout -->
+    <polygon points="160,200 220,170 190,140 140,165" fill="url(#facetLight)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="140,165 190,140 160,120 120,135" fill="url(#facetLight)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="120,135 160,120 130,105 90,115" fill="url(#facetLight)" stroke="#111115" stroke-width="1.5"/>
+
+    <!-- Snout Point -->
+    <polygon points="90,115 130,105 105,95 65,100" fill="url(#facetMid)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="65,100 105,95 85,85 50,85" fill="url(#facetDark)" stroke="#111115" stroke-width="1.5"/>
+    <!-- Pink Nose Tip -->
+    <polygon points="50,85 65,80 55,75 40,80" fill="url(#facetPink)" stroke="#c2185b" stroke-width="1.5"/>
+
+    <!-- Snout Bottom / Jaw -->
+    <polygon points="65,100 90,115 110,135 75,120" fill="url(#facetDark)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="110,135 140,165 150,190 100,160" fill="url(#facetDark)" stroke="#111115" stroke-width="1.5"/>
+
+    <!-- Low-Poly Big Rounded Ears -->
+    <!-- Left Ear (Foreground) -->
+    <polygon points="155,115 185,85 195,110 165,130" fill="url(#facetMid)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="165,130 195,110 190,135 160,145" fill="url(#facetDark)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="185,85 210,95 195,110" fill="url(#facetPink)" stroke="#c2185b" stroke-width="1.5"/>
+    <!-- Right Ear (Background) -->
+    <polygon points="210,140 240,110 250,130 220,150" fill="url(#facetDark)" stroke="#111115" stroke-width="1.5"/>
+    <polygon points="240,110 260,120 250,130" fill="url(#facetPink)" stroke="#c2185b" stroke-width="1.5"/>
+
+    <!-- Low-Poly Beady Red Eyes -->
+    <polygon points="105,125 115,120 120,128 110,132" fill="#ff0033" stroke="#ffffff" stroke-width="1"/>
+    <polygon points="150,145 160,140 165,148 155,152" fill="#ff0033" stroke="#ffffff" stroke-width="1"/>
+
+    <!-- Low-Poly Paws / Feet -->
+    <!-- Front Paw -->
+    <polygon points="130,260 145,295 130,310 115,290" fill="url(#facetPink)" stroke="#c2185b" stroke-width="1.5"/>
+    <polygon points="130,310 145,295 155,305 140,320" fill="url(#facetPink)" stroke="#c2185b" stroke-width="1.5"/>
+    <!-- Back Paw -->
+    <polygon points="260,320 280,355 260,370 240,345" fill="url(#facetPink)" stroke="#c2185b" stroke-width="1.5"/>
+    <polygon points="260,370 280,355 295,365 275,380" fill="url(#facetPink)" stroke="#c2185b" stroke-width="1.5"/>
+
+    <!-- Low-Poly Whisker Lines (Stylized vector rays) -->
+    <line x1="60" y1="90" x2="10" y2="65" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="65" y1="98" x2="15" y2="100" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="60" y1="105" x2="25" y2="135" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Wireframe Edge Accents for pure 90s/PS1 aesthetic -->
+    <line x1="160" y1="200" x2="190" y2="240" stroke="#00ffff" stroke-width="1" opacity="0.6"/>
+    <line x1="270" y1="190" x2="280" y2="270" stroke="#00ffff" stroke-width="1" opacity="0.6"/>
+    <line x1="220" y1="170" x2="270" y2="190" stroke="#00ffff" stroke-width="1" opacity="0.6"/>
+  </g>
+
+  <!-- Retrowave Label -->
+  <text x="250" y="470" font-family="'Courier New', monospace" font-size="20" font-weight="bold" fill="#00ffcc" text-anchor="middle" letter-spacing="4">
+    SPINNING_RAT.OBJ
+  </text>
+</svg>

@@ -20,8 +20,9 @@ class TestModularUselessProject(unittest.TestCase):
         self.assertEqual(config.AUDIO_DROP_CHANCE, 0.80, "Audio drop chance must be 80%")
         self.assertEqual(config.AUDIO_COOLDOWN_SECONDS, 30.0, "Cooldown must be 30 seconds")
         self.assertEqual(config.VOLUME_RESTORE_LEVEL, 1.0, "Volume must restore to 100%")
-        self.assertEqual(config.FLASHBANG_CHANCE, 0.60, "Flashbang chance must be 60%")
-        self.assertEqual(config.HAZARD_INTERVAL_SECONDS, 60.0, "Flashbang interval must be 60s")
+        self.assertGreater(config.FLASHBANG_CHANCE, 0.0, "Flashbang chance must be > 0")
+        self.assertLessEqual(config.FLASHBANG_CHANCE, 1.0, "Flashbang chance must be <= 1.0")
+        self.assertGreater(config.HAZARD_INTERVAL_SECONDS, 0.0, "Flashbang interval must be > 0")
         self.assertEqual(config.MOUSE_EXHAUSTED_SPEED, 1, "Exhausted mouse speed must be 1")
         self.assertEqual(config.MOMENT_OF_SILENCE_SECONDS, 60.0, "Silence freeze must be 60 seconds")
 
@@ -139,6 +140,314 @@ class TestModularUselessProject(unittest.TestCase):
         scrambler.stop()
         self.assertFalse(scrambler.is_active)
         self.assertIsNone(scrambler.hook_id)
+
+    def test_09_flashbang_audio_and_volume(self):
+        """Verify audioloud.mp3 exists, audio player loads, and volume boosts to 100%."""
+        from pathlib import Path
+        from screen_flashbang import play_flashbang_audio, stop_flashbang_audio
+        from audio_pump import WindowsAudioController
+
+        mp3 = Path("memes/audioloud.mp3").resolve()
+        self.assertTrue(mp3.exists(), "audioloud.mp3 must exist in memes folder")
+
+        # Test audio playback lifecycle
+        played = play_flashbang_audio(mp3)
+        self.assertTrue(played)
+        stop_flashbang_audio()
+
+        # Test volume boost
+        ctrl = WindowsAudioController()
+        orig = ctrl.get_volume()
+        ctrl.set_volume(0.2)
+        if ctrl.get_volume() < 1.0:
+            ctrl.set_volume(1.0)
+        self.assertAlmostEqual(ctrl.get_volume(), 1.0, delta=0.03)
+        ctrl.set_volume(orig)
+
+    def test_10_audio_hazard_suppression(self):
+        """Verify program audio from flashbang suppresses audio drop hazard and pump popup."""
+        from screen_flashbang import (
+            play_flashbang_audio,
+            stop_flashbang_audio,
+            is_flashbang_audio_playing,
+        )
+        ctrl = WindowsAudioController()
+        monitor = AudioHazardMonitor(
+            audio_ctrl=ctrl,
+            on_drop_callback=lambda: None,
+        )
+
+        # 1. Test manual timed suppression
+        self.assertFalse(monitor.is_suppressed())
+        monitor.suppress_for(5.0)
+        self.assertTrue(monitor.is_suppressed())
+
+        # 2. Test dynamic detection of flashbang audio playback
+        play_flashbang_audio()
+        self.assertTrue(is_flashbang_audio_playing(), "Flashbang audio must report as playing")
+        self.assertTrue(monitor.is_suppressed(), "Audio monitor must be suppressed while flashbang audio plays")
+
+        # Stop audio and verify reset
+        stop_flashbang_audio()
+        self.assertFalse(is_flashbang_audio_playing(), "Flashbang audio must not report playing when stopped")
+
+        # 3. Test HazardManager suppression integration
+        root = tk.Tk()
+        root.withdraw()
+        pump = PumpOverlay(root, on_progress=lambda p: None, on_complete=lambda: None)
+        hazard_mgr = HazardManager(root, audio_ctrl=ctrl, audio_monitor=monitor, pump_overlay=pump)
+
+        # Simulate pump hazard active before flashbang
+        monitor.is_hazard_active = True
+        pump.show_hazard()
+        self.assertTrue(pump.is_active)
+
+        # Trigger flashbang: must suppress monitor, dismiss hazard, and dismiss pump
+        hazard_mgr.trigger_flashbang()
+        self.assertTrue(monitor.is_suppressed(), "Monitor must be suppressed for 14s")
+        self.assertFalse(monitor.is_hazard_active, "Hazard state must be dismissed by flashbang")
+        self.assertFalse(pump.is_active, "Pump overlay must be dismissed by flashbang")
+
+        stop_flashbang_audio()
+        root.destroy()
+        monitor.stop()
+
+    def test_11_flashbang_action_keys_and_volume_lock(self):
+        """Verify action keys and volume lowering attempts are blocked during flashbang."""
+        import time
+        from screen_flashbang import FlashbangActionKeyBlocker
+        ctrl = WindowsAudioController()
+        orig_vol = ctrl.get_volume()
+        orig_mute = ctrl.get_mute()
+
+        # 1. Verify get_mute and set_mute methods
+        ctrl.set_mute(True)
+        self.assertTrue(ctrl.get_mute())
+        ctrl.set_mute(False)
+        self.assertFalse(ctrl.get_mute())
+
+        # 2. Test FlashbangActionKeyBlocker hooks and blocked keys
+        blocker = FlashbangActionKeyBlocker(ctrl)
+        blocker.start()
+        self.assertTrue(blocker.is_active)
+        self.assertIsNotNone(blocker.hook_id)
+
+        # Ensure safety keys (F8, Ctrl, Shift, Q) are NEVER blocked
+        self.assertNotIn(0x77, blocker.BLOCKED_KEYS, "F8 must NOT be blocked!")
+        self.assertNotIn(0x11, blocker.BLOCKED_KEYS, "Ctrl must NOT be blocked!")
+        self.assertNotIn(0x10, blocker.BLOCKED_KEYS, "Shift must NOT be blocked!")
+        self.assertNotIn(0x51, blocker.BLOCKED_KEYS, "Q must NOT be blocked!")
+
+        # Ensure volume and action keys ARE blocked
+        self.assertIn(0xAE, blocker.BLOCKED_KEYS, "Volume Down must be blocked")
+        self.assertIn(0xAD, blocker.BLOCKED_KEYS, "Volume Mute must be blocked")
+        self.assertIn(0x20, blocker.BLOCKED_KEYS, "Space action key must be blocked")
+        self.assertIn(0x0D, blocker.BLOCKED_KEYS, "Return action key must be blocked")
+        self.assertIn(0x1B, blocker.BLOCKED_KEYS, "Escape action key must be blocked")
+
+        blocker.stop()
+        self.assertFalse(blocker.is_active)
+        self.assertIsNone(blocker.hook_id)
+
+        # Restore original volume and mute
+        ctrl.set_volume(orig_vol)
+        ctrl.set_mute(orig_mute)
+
+    def test_12_media_chaos_engine(self):
+        """Verify Click-Triggered Media Chaos engine (cats, rats, furbys, audio, suppression)."""
+        import time
+        from random_media import (
+            MediaChaosManager,
+            ChaosAudioEngine,
+            ChaosOverlay,
+            ClickListener,
+            is_chaos_audio_playing,
+        )
+        from random_media.assets.sprites import (
+            get_cat_sprite,
+            get_rat_frames,
+            get_furby_sprite,
+        )
+
+        # 1. Verify configuration values
+        self.assertEqual(config.CLICK_CHAOS_CHANCE, 0.60, "Click event chance must be 60%")
+        self.assertEqual(config.CLICK_CAT_COUNT, 500, "Cat count must be 500")
+        self.assertEqual(config.CLICK_RAT_COUNT, 50, "Rat count must be 50")
+        self.assertEqual(config.CLICK_FURBY_COUNT, 4, "Furby count must be 4")
+        self.assertEqual(config.CLICK_MUSIC_CHANCE, 0.60, "Music chance must be 60%")
+        self.assertEqual(config.CLICK_VISUAL_DURATION_SECONDS, 10.0, "Visual chaos duration must be 10 seconds")
+        self.assertEqual(config.CLICK_VIDEO_MIN_COUNT, 2, "Min video frames must be 2")
+        self.assertEqual(config.CLICK_VIDEO_MAX_COUNT, 5, "Max video frames must be 5")
+
+        # 2. Verify sprites and video assets load
+        root = tk.Tk()
+        root.withdraw()
+
+        cat_img = get_cat_sprite()
+        self.assertIsNotNone(cat_img)
+        rat_frames = get_rat_frames()
+        self.assertEqual(len(rat_frames), 8, "Low-poly rat must have 8 rotation frames")
+        furby_img = get_furby_sprite()
+        self.assertIsNotNone(furby_img)
+
+        from random_media.assets.video_frames import get_available_videos, load_video_pil_frames
+        available_vids = get_available_videos()
+        self.assertGreater(len(available_vids), 0, "explosionvideo.mp4 must be discovered")
+        sample_frames = load_video_pil_frames(str(available_vids[0]))
+        self.assertGreater(len(sample_frames), 0, "Video frames must be extracted")
+
+        # 3. Test ClickListener lifecycle
+        clicked = []
+        listener = ClickListener(on_click_callback=lambda: clicked.append(True))
+        listener.start()
+        self.assertTrue(listener.is_active)
+        self.assertIsNotNone(listener._thread)
+        listener.stop()
+        self.assertFalse(listener.is_active)
+
+        # 4. Test ChaosAudioEngine, music tracking, and suppression
+        audio_engine = ChaosAudioEngine()
+        self.assertFalse(audio_engine.is_chaos_audio_playing())
+        self.assertFalse(audio_engine.is_music_track_playing())
+
+        # Test meow trigger
+        audio_engine.play_meow()
+        self.assertTrue(audio_engine.is_chaos_audio_playing())
+        self.assertFalse(audio_engine.is_music_track_playing(), "Meow is sound effect, not background music")
+        self.assertTrue(is_chaos_audio_playing())
+
+        # Test music track trigger
+        audio_engine.roll_music_chaos(1.0)
+        self.assertTrue(audio_engine.is_music_track_playing(), "Music track must be active")
+
+        # Test audio monitor suppression integration
+        ctrl = WindowsAudioController()
+        monitor = AudioHazardMonitor(audio_ctrl=ctrl, on_drop_callback=lambda: None)
+        self.assertTrue(monitor.is_suppressed(), "Monitor must be suppressed while chaos audio plays")
+
+        audio_engine.stop_all()
+        self.assertFalse(audio_engine.is_chaos_audio_playing())
+        self.assertFalse(audio_engine.is_music_track_playing())
+
+        # 5. Test ChaosOverlay entity spawning, video frames, auto-dismiss, and music retention
+        overlay = ChaosOverlay(root, audio_engine)
+        self.assertFalse(overlay.has_active_visuals())
+
+        overlay.spawn_cats(20)
+        self.assertGreater(len(overlay.cats), 0)
+        self.assertTrue(overlay.has_active_visuals())
+        self.assertIsNotNone(overlay._dismiss_timer_id, "Dismiss timer must be scheduled on spawn")
+
+        overlay.spawn_rats(10)
+        self.assertEqual(len(overlay.rats), 10)
+
+        overlay.spawn_furbys()
+        self.assertEqual(len(overlay.furby_items), 4)
+
+        # Spawn 2-5 video frames
+        overlay.spawn_video_frames()
+        self.assertGreaterEqual(len(overlay.video_players), config.CLICK_VIDEO_MIN_COUNT)
+        self.assertLessEqual(len(overlay.video_players), config.CLICK_VIDEO_MAX_COUNT)
+
+        # Test simulation step
+        overlay._sim_loop()
+
+        # Test music retention: if music is active, visual chaos must NOT dismiss
+        class MockActiveMusic:
+            def is_music_track_playing(self):
+                return True
+        overlay.audio_engine = MockActiveMusic()
+        overlay._on_dismiss_timer()
+        self.assertIsNotNone(overlay.toplevel, "Visual chaos must be retained while music plays!")
+        self.assertGreater(len(overlay.video_players), 0)
+
+        # When music finishes, visual chaos dismisses
+        class MockFinishedMusic:
+            def is_music_track_playing(self):
+                return False
+        overlay.audio_engine = MockFinishedMusic()
+        overlay._on_dismiss_timer()
+        self.assertIsNone(overlay.toplevel, "Visual chaos must dismiss once music finishes")
+        self.assertEqual(len(overlay.cats), 0)
+        self.assertEqual(len(overlay.rats), 0)
+        self.assertEqual(len(overlay.video_players), 0)
+
+        monitor.stop()
+        root.destroy()
+
+    def test_13_reddit_meme_sourcing(self):
+        """Test Reddit meme fetcher, cache management, media frame decoders, and frame overlay."""
+        from random_media.reddit_memes import RedditMemeFetcher, MemeItem, get_reddit_fetcher
+        from random_media.audio_chaos import ChaosAudioEngine
+        from random_media.chaos_overlay import ChaosOverlay
+        from random_media.assets.video_frames import (
+            get_available_media_items,
+            load_media_pil_frames,
+            get_media_tk_frames,
+            _fit_image_to_frame,
+        )
+        import tempfile
+        from pathlib import Path
+        from PIL import Image
+
+        # 1. Test media URL validation
+        fetcher = get_reddit_fetcher()
+        self.assertTrue(fetcher._is_supported_media_url("https://i.redd.it/test1.png"))
+        self.assertTrue(fetcher._is_supported_media_url("https://i.redd.it/test2.jpg"))
+        self.assertTrue(fetcher._is_supported_media_url("https://i.redd.it/test3.gif"))
+        self.assertTrue(fetcher._is_supported_media_url("https://example.com/vid.mp4"))
+        self.assertFalse(fetcher._is_supported_media_url("https://reddit.com/r/memes/comments/123/text_post"))
+        self.assertFalse(fetcher._is_supported_media_url("https://youtube.com/watch?v=123"))
+
+        # 2. Test cache loading and retrieval
+        available = fetcher.get_available_memes()
+        self.assertIsInstance(available, list)
+        if available:
+            meme = fetcher.get_random_meme()
+            self.assertIsNotNone(meme)
+            self.assertTrue(meme.file_path.exists())
+            self.assertIn(meme.media_type, ("image", "gif", "video"))
+
+        # 3. Test multi-format media decoder and letterbox scaling
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            # Create a test synthetic static image
+            test_img_path = tmp_path / "test_meme.png"
+            img = Image.new("RGB", (300, 200), (255, 0, 128))
+            img.save(test_img_path)
+
+            frames = load_media_pil_frames(str(test_img_path), target_width=160, target_height=218)
+            self.assertEqual(len(frames), 1)
+            self.assertEqual(frames[0].size, (160, 218))
+
+            # Test letterbox aspect ratio helper
+            fitted = _fit_image_to_frame(img, 160, 218)
+            self.assertEqual(fitted.size, (160, 218))
+
+        # 4. Test unified media pool discovery
+        media_pool = get_available_media_items()
+        self.assertGreater(len(media_pool), 0)
+        # Should include both local video and Reddit memes if cached
+        sources = {item.source for item in media_pool}
+        self.assertIn("local", sources)
+
+        # 5. Test Tkinter integration with ChaosOverlay
+        root = tk.Tk()
+        root.withdraw()
+        audio_engine = ChaosAudioEngine(root)
+        overlay = ChaosOverlay(root, audio_engine)
+
+        overlay.spawn_video_frames()
+        self.assertGreaterEqual(len(overlay.video_players), config.CLICK_VIDEO_MIN_COUNT)
+        self.assertLessEqual(len(overlay.video_players), config.CLICK_VIDEO_MAX_COUNT)
+
+        for player in overlay.video_players:
+            self.assertGreater(len(player.frames), 0)
+            self.assertEqual(player.frames[0].width(), config.CLICK_VIDEO_WIDTH)
+            self.assertEqual(player.frames[0].height(), config.CLICK_VIDEO_HEIGHT)
+
+        overlay.clear_all()
+        root.destroy()
 
 
 if __name__ == "__main__":

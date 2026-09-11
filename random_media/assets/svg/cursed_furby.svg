@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Cursed room void aura -->
+    <radialGradient id="furbyAura" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#4a0e4e" stop-opacity="0.8"/>
+      <stop offset="60%" stop-color="#12001a" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Mottled Fur Body Gradient -->
+    <radialGradient id="furGrad" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#37474f"/>
+      <stop offset="50%" stop-color="#212121"/>
+      <stop offset="85%" stop-color="#111111"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+
+    <!-- Plastic Faceplate Gradient -->
+    <linearGradient id="faceplateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#eceff1"/>
+      <stop offset="30%" stop-color="#cfd8dc"/>
+      <stop offset="85%" stop-color="#90a4ae"/>
+      <stop offset="100%" stop-color="#607d8b"/>
+    </linearGradient>
+
+    <!-- Glass Robotic Eye Sphere Gradient -->
+    <radialGradient id="roboticEye" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#b2ebf2"/>
+      <stop offset="60%" stop-color="#00bcd4"/>
+      <stop offset="85%" stop-color="#006064"/>
+      <stop offset="100%" stop-color="#00251a"/>
+    </radialGradient>
+
+    <!-- Mechanical Beak Gradient -->
+    <linearGradient id="beakGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffee58"/>
+      <stop offset="60%" stop-color="#fdd835"/>
+      <stop offset="100%" stop-color="#f57f17"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ominous background aura -->
+  <circle cx="250" cy="250" r="235" fill="url(#furbyAura)"/>
+
+  <!-- Creepy Big Furry Ears with Plastic Insides -->
+  <!-- Left Ear -->
+  <g transform="rotate(-15 120 180)">
+    <path d="M 60 140 C 20 80 80 40 140 100 C 160 140 130 180 90 170 Z" fill="#263238" stroke="#102027" stroke-width="4"/>
+    <!-- Inner pink ear shell -->
+    <path d="M 75 130 C 50 90 90 65 130 105 C 140 130 120 155 95 150 Z" fill="#f48fb1" stroke="#ad1457" stroke-width="2"/>
+    <path d="M 40 85 L 65 110 M 35 105 L 60 125" stroke="#37474f" stroke-width="3"/>
+  </g>
+
+  <!-- Right Ear -->
+  <g transform="rotate(15 380 180)">
+    <path d="M 440 140 C 480 80 420 40 360 100 C 340 140 370 180 410 170 Z" fill="#263238" stroke="#102027" stroke-width="4"/>
+    <!-- Inner pink ear shell -->
+    <path d="M 425 130 C 450 90 410 65 370 105 C 360 130 380 155 405 150 Z" fill="#f48fb1" stroke="#ad1457" stroke-width="2"/>
+    <path d="M 460 85 L 435 110 M 465 105 L 440 125" stroke="#37474f" stroke-width="3"/>
+  </g>
+
+  <!-- Spiky Ear Fur Tufts -->
+  <polygon points="120,130 100,80 140,110" fill="#37474f"/>
+  <polygon points="380,130 400,80 360,110" fill="#37474f"/>
+
+  <!-- Round Fuzzy Gremlin Body -->
+  <ellipse cx="250" cy="290" rx="175" ry="165" fill="url(#furGrad)" stroke="#111111" stroke-width="6"/>
+
+  <!-- Spiky Tufts of Body Fur around silhouette -->
+  <polygon points="80,260 55,270 85,285" fill="#263238"/>
+  <polygon points="75,310 50,325 80,335" fill="#263238"/>
+  <polygon points="420,260 445,270 415,285" fill="#263238"/>
+  <polygon points="425,310 450,325 420,335" fill="#263238"/>
+
+  <!-- White belly fluff patch -->
+  <ellipse cx="250" cy="360" rx="85" ry="75" fill="#eceff1" opacity="0.85"/>
+  <path d="M 210 330 Q 250 345 290 330 Q 270 380 250 390 Q 230 380 210 330 Z" fill="#cfd8dc" opacity="0.6"/>
+
+  <!-- Little molded plastic feet -->
+  <ellipse cx="180" cy="445" rx="36" ry="18" fill="#ffb74d" stroke="#e65100" stroke-width="3"/>
+  <ellipse cx="320" cy="445" rx="36" ry="18" fill="#ffb74d" stroke="#e65100" stroke-width="3"/>
+  <!-- Toe ridges -->
+  <line x1="165" y1="440" x2="160" y2="460" stroke="#e65100" stroke-width="3"/>
+  <line x1="185" y1="440" x2="185" y2="463" stroke="#e65100" stroke-width="3"/>
+  <line x1="205" y1="440" x2="210" y2="460" stroke="#e65100" stroke-width="3"/>
+  <line x1="305" y1="440" x2="300" y2="460" stroke="#e65100" stroke-width="3"/>
+  <line x1="325" y1="440" x2="325" y2="463" stroke="#e65100" stroke-width="3"/>
+  <line x1="345" y1="440" x2="350" y2="460" stroke="#e65100" stroke-width="3"/>
+
+  <!-- ICONIC HARD MOLDED PLASTIC FACEPLATE -->
+  <path d="M 160 210 
+           C 160 150 200 135 250 135 
+           C 300 135 340 150 340 210 
+           C 340 270 300 315 250 315 
+           C 200 315 160 270 160 210 Z" 
+        fill="url(#faceplateGrad)" stroke="#37474f" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- Faceplate Eyelash / Brow Moldings -->
+  <path d="M 175 165 C 190 150 225 150 235 165" stroke="#263238" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M 265 165 C 275 150 310 150 325 165" stroke="#263238" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- Stiff creepy eyelashes -->
+  <line x1="185" y1="155" x2="180" y2="140" stroke="#000000" stroke-width="3"/>
+  <line x1="205" y1="150" x2="205" y2="135" stroke="#000000" stroke-width="3"/>
+  <line x1="225" y1="155" x2="230" y2="140" stroke="#000000" stroke-width="3"/>
+  <line x1="275" y1="155" x2="270" y2="140" stroke="#000000" stroke-width="3"/>
+  <line x1="295" y1="150" x2="295" y2="135" stroke="#000000" stroke-width="3"/>
+  <line x1="315" y1="155" x2="320" y2="140" stroke="#000000" stroke-width="3"/>
+
+  <!-- UNBLINKING GLASSY ROBOTIC SOUL-STARING EYES -->
+  <!-- Left Eye Socket -->
+  <circle cx="205" cy="205" r="34" fill="#111111" stroke="#37474f" stroke-width="3"/>
+  <circle cx="205" cy="205" r="31" fill="url(#roboticEye)"/>
+  <!-- Dilated Dead Void Pupil -->
+  <circle cx="205" cy="205" r="18" fill="#000000"/>
+  <!-- Creepy pinprick red sensor glow in pupil center -->
+  <circle cx="205" cy="205" r="3" fill="#ff0044"/>
+  <!-- Glare reflections -->
+  <ellipse cx="198" cy="195" rx="7" ry="5" fill="#ffffff" opacity="0.9"/>
+  <circle cx="212" cy="214" r="3" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Right Eye Socket -->
+  <circle cx="295" cy="205" r="34" fill="#111111" stroke="#37474f" stroke-width="3"/>
+  <circle cx="295" cy="205" r="31" fill="url(#roboticEye)"/>
+  <!-- Dilated Dead Void Pupil -->
+  <circle cx="295" cy="205" r="18" fill="#000000"/>
+  <!-- Creepy pinprick red sensor glow -->
+  <circle cx="295" cy="205" r="3" fill="#ff0044"/>
+  <!-- Glare reflections -->
+  <ellipse cx="288" cy="195" rx="7" ry="5" fill="#ffffff" opacity="0.9"/>
+  <circle cx="302" cy="214" r="3" fill="#ffffff" opacity="0.7"/>
+
+  <!-- MOLDED PLASTIC BEAK (Slightly Parted) -->
+  <!-- Upper Beak -->
+  <path d="M 230 250 Q 250 240 270 250 L 250 272 Z" fill="url(#beakGrad)" stroke="#e65100" stroke-width="2.5"/>
+  
+  <!-- Mouth Cavity inside parted beak -->
+  <polygon points="236,252 264,252 250,270" fill="#1a0000"/>
+  <!-- Tiny mechanical pink tongue -->
+  <ellipse cx="250" cy="262" rx="5" ry="4" fill="#ff4081"/>
+
+  <!-- Lower Beak -->
+  <path d="M 236 256 Q 250 254 264 256 L 250 278 Z" fill="url(#beakGrad)" stroke="#e65100" stroke-width="2.5"/>
+
+  <!-- Creepy Forehead Sensor Window (Infrared oval) -->
+  <ellipse cx="250" cy="160" rx="10" ry="6" fill="#212121" stroke="#607d8b" stroke-width="1.5"/>
+  <circle cx="250" cy="160" r="2.5" fill="#b71c1c"/>
+
+  <!-- Ominous Whispering Text -->
+  <text x="250" y="485" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#ff0055" text-anchor="middle" letter-spacing="3">
+    "Y O O - L O O . . . A G A I N"
+  </text>
+</svg>
