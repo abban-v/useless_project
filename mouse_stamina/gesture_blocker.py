@@ -61,10 +61,11 @@ class WindowsGestureBlocker:
     while the mouse is dead.
     """
 
-    def __init__(self):
+    def __init__(self, on_click_callback=None):
         self.mouse_hook = None
         self.kbd_hook = None
         self.is_active = False
+        self.on_click_callback = on_click_callback
 
         self._c_mouse_cb = HOOKPROC(self._mouse_hook_callback)
         self._c_kbd_cb = HOOKPROC(self._kbd_hook_callback)
@@ -73,7 +74,14 @@ class WindowsGestureBlocker:
 
     def _mouse_hook_callback(self, nCode, wParam, lParam):
         if nCode >= 0 and self.is_active:
-            # Block ALL mouse movement, clicks, scrolls, and drag gestures
+            # If user clicked while frozen, notify callback so chaos effects trigger!
+            if wParam in (0x0201, 0x0204, 0x0207):  # WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_MBUTTONDOWN
+                if self.on_click_callback:
+                    try:
+                        self.on_click_callback()
+                    except Exception:
+                        pass
+            # Block ALL mouse movement, clicks, scrolls, and drag gestures from reaching OS/apps
             return 1
         return user32.CallNextHookEx(None, nCode, wParam, lParam)
 

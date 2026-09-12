@@ -15,7 +15,6 @@ user32 = ctypes.windll.user32
 SPI_GETMOUSESPEED = 0x0070
 SPI_SETMOUSESPEED = 0x0071
 
-
 class RECT(ctypes.Structure):
     _fields_ = [
         ("left", wintypes.LONG),
@@ -23,6 +22,16 @@ class RECT(ctypes.Structure):
         ("right", wintypes.LONG),
         ("bottom", wintypes.LONG),
     ]
+
+# Explicit ctypes function signatures for 64-bit safety
+user32.ClipCursor.argtypes = [ctypes.c_void_p]
+user32.ClipCursor.restype = wintypes.BOOL
+
+user32.SetCursorPos.argtypes = [ctypes.c_int, ctypes.c_int]
+user32.SetCursorPos.restype = wintypes.BOOL
+
+user32.SystemParametersInfoW.argtypes = [wintypes.UINT, wintypes.UINT, ctypes.c_void_p, wintypes.UINT]
+user32.SystemParametersInfoW.restype = wintypes.BOOL
 
 
 def attach_input_desktop():
@@ -38,7 +47,7 @@ def attach_input_desktop():
 class MouseSpeedController:
     """Safely throttles, immobilizes, and blocks mouse & gesture inputs during exhaustion."""
 
-    def __init__(self):
+    def __init__(self, on_click_callback=None):
         attach_input_desktop()
         self.original_speed = self._get_current_speed()
         self.is_throttled = False
@@ -46,7 +55,7 @@ class MouseSpeedController:
         self.freeze_x = 0
         self.freeze_y = 0
 
-        self.gesture_blocker = WindowsGestureBlocker()
+        self.gesture_blocker = WindowsGestureBlocker(on_click_callback=on_click_callback)
         atexit.register(self.cleanup)
 
     def _get_current_speed(self) -> int:

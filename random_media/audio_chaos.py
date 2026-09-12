@@ -8,6 +8,7 @@ concurrently using native Windows COM WMPlayer.OCX dispatched via the Tkinter me
 import os
 import random
 import time
+import weakref
 import tkinter as tk
 from pathlib import Path
 from typing import List, Optional
@@ -18,7 +19,7 @@ from config import CLICK_MUSIC_CHANCE
 MUSIC_DIR = Path(__file__).parent.parent / "music"
 MEOW_PATH = MUSIC_DIR / "meow.m4a"
 
-_active_engines = set()
+_active_engines = weakref.WeakSet()
 _track_duration_cache = {}
 
 

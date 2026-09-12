@@ -20,14 +20,16 @@ from config import (
     AUDIO_COOLDOWN_SECONDS,
     HAZARD_INTERVAL_SECONDS,
     FLASHBANG_CHANCE,
-    MOUSE_EXHAUSTED_SPEED,
     KEYBOARD_SCRAMBLE_CHANCE,
+    SHOE_GAME_CHANCE,
+    SHOE_GAME_INTERVAL_SECONDS,
 )
 from audio_pump import WindowsAudioController, AudioHazardMonitor, PumpOverlay
 from screen_flashbang import HazardManager, stop_flashbang_audio
 from mouse_stamina import MouseSpeedController, MouseStaminaHUD, attach_input_desktop
 from keyboard_scramble import KeyboardScrambler
 from random_media import MediaChaosManager
+from shoe_game import ShoeGameManager
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -57,6 +59,7 @@ class UselessApp:
         print(f"  * Mouse Stamina:   Floating HUD above cursor -> Exhaustion freeze & 'ONE MOMENT OF SILENCE'")
         print(f"  * Keyboard Chaos:  {int(KEYBOARD_SCRAMBLE_CHANCE * 100)}% chance of typed letter swapping (e.g. g -> h)")
         print(f"  * Click Chaos:     60% chance on click -> 500 Bouncing Cats, 50 Spinning Rats, 4 Furbys & Music")
+        print(f"  * Shoe Game:       {int(SHOE_GAME_CHANCE * 100)}% chance every {int(SHOE_GAME_INTERVAL_SECONDS)}s -> Fullscreen Virtual/Real Shoe Chaos")
         print(" Safety:")
         print("  * Press [F8] or [Ctrl + Shift + Q] anywhere to EMERGENCY EXIT & RESTORE!")
         print("=" * 60)
@@ -100,7 +103,13 @@ class UselessApp:
         # 7. Click Chaos Engine (500 Cats, 50 Rats, 4 Furbys, Music Chaos)
         self.media_chaos = MediaChaosManager(self.root)
 
-        # 8. Safety Hotkey Thread
+        # Allow clicks during mouse exhaustion freeze to still trigger chaos events
+        self.mouse_speed_ctrl.gesture_blocker.on_click_callback = self.media_chaos._on_mouse_click
+
+        # 8. Shoe Game Manager (40% chance every 60s -> Fullscreen Shoe Chaos)
+        self.shoe_game = ShoeGameManager(self.root, self.audio_ctrl)
+
+        # 9. Safety Hotkey Thread
         self.is_running = True
         self.hotkey_thread = threading.Thread(target=self._hotkey_listener, daemon=True)
 
@@ -109,7 +118,11 @@ class UselessApp:
 
     def _on_audio_dropped(self):
         """Dispatched when 80% audio hazard drops volume to 0."""
-        self.root.after(0, self.pump_overlay.show_hazard)
+        self.root.after(0, self._activate_audio_hazard)
+
+    def _activate_audio_hazard(self):
+        self.audio_monitor.key_blocker.start()
+        self.pump_overlay.show_hazard()
 
     def _on_pump_progress(self, current_percent: float):
         """Called as user pumps the handle."""
@@ -140,6 +153,7 @@ class UselessApp:
         self.hazard_manager.start()
         self.keyboard_scrambler.start()
         self.media_chaos.start()
+        self.shoe_game.start()
         self.hotkey_thread.start()
 
         try:
@@ -153,6 +167,11 @@ class UselessApp:
             return
         self.is_running = False
         print("\n[UselessApp] Cleaning up and restoring Windows parameters...")
+
+        try:
+            self.shoe_game.stop()
+        except Exception:
+            pass
 
         try:
             self.media_chaos.stop()

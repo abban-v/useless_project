@@ -116,8 +116,11 @@ class SilenceOverlay(tk.Toplevel):
     def update_remaining(self, seconds_left: float):
         """Updates remaining seconds countdown."""
         self.remaining_seconds = max(0.0, seconds_left)
-        if self.canvas.winfo_exists():
-            self._redraw_text()
+        try:
+            if hasattr(self, "canvas") and self.canvas.winfo_exists():
+                self._redraw_text()
+        except Exception:
+            pass
 
     def dismiss(self):
         """Cleanly destroys overlay."""

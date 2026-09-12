@@ -53,9 +53,11 @@ SetWindowPos.argtypes = [
 ]
 SetWindowPos.restype = wintypes.BOOL
 
-
 class POINT(ctypes.Structure):
     _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
+
+user32.GetCursorPos.argtypes = [ctypes.POINTER(POINT)]
+user32.GetCursorPos.restype = wintypes.BOOL
 
 
 class MouseStaminaHUD(tk.Toplevel):

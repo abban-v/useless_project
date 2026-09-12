@@ -27,10 +27,10 @@ VOLUME_RESTORE_LEVEL = 1.0
 # ==========================================
 # Screen Flashbang Hazard
 # ==========================================
-# Periodic check every minute (60s)
+# Periodic check interval in seconds (default 30s)
 HAZARD_INTERVAL_SECONDS = 30.0
 
-# 60% chance of screen flashbang each minute
+# Chance of screen flashbang on each check (70%)
 FLASHBANG_CHANCE = 0.70
 
 # Flashbang visual fade duration in seconds
@@ -128,4 +128,22 @@ REDDIT_FETCH_INTERVAL_SECONDS = 300.0
 # Optional Reddit OAuth app credentials (leave empty to use public endpoints out of the box)
 REDDIT_CLIENT_ID = ""
 REDDIT_CLIENT_SECRET = ""
+
+# ==========================================
+# Shoe Game Hazard
+# ==========================================
+# Periodic check every minute (60s)
+SHOE_GAME_INTERVAL_SECONDS = 60.0
+
+# 40% chance of shoe game launching
+SHOE_GAME_CHANCE = 0.40
+
+# Duration of Real Mode ("shoes can't think") in seconds
+SHOE_GAME_REAL_MODE_SECONDS = 10.0
+
+# Duration of Virtual Mode walking phase in seconds
+SHOE_GAME_VIRTUAL_MODE_SECONDS = 20.0
+
+# Duration of scream audio blast in seconds
+SHOE_GAME_SCREAM_SECONDS = 3.0
 

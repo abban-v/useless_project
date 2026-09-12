@@ -39,6 +39,7 @@ class PumpOverlay(tk.Toplevel):
         self.is_completed = False
         self.handle_offset = 0  # Stroke animation
         self.last_tick_time = time.time()
+        self._decay_after_id = None
 
         self._build_ui()
         self._block_action_keys()
@@ -169,6 +170,13 @@ class PumpOverlay(tk.Toplevel):
 
     def show_hazard(self):
         """Called when 80% audio hazard drops volume."""
+        if self._decay_after_id is not None:
+            try:
+                self.after_cancel(self._decay_after_id)
+            except Exception:
+                pass
+            self._decay_after_id = None
+
         self.current_volume = 0.0
         self.is_completed = False
         self.is_active = True
@@ -246,7 +254,7 @@ class PumpOverlay(tk.Toplevel):
             if self.on_progress:
                 self.on_progress(self.current_volume)
 
-        self.after(50, self._decay_loop)
+        self._decay_after_id = self.after(50, self._decay_loop)
 
     def _handle_victory(self):
         """User succeeded in pumping back to 100%."""
@@ -264,8 +272,15 @@ class PumpOverlay(tk.Toplevel):
 
     def _dismiss(self):
         self.is_active = False
+        if self._decay_after_id is not None:
+            try:
+                self.after_cancel(self._decay_after_id)
+            except Exception:
+                pass
+            self._decay_after_id = None
         self.withdraw()
 
     def dismiss(self):
         """Immediately closes and resets the pump overlay."""
+        self.is_completed = False
         self._dismiss()

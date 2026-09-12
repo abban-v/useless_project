@@ -125,23 +125,29 @@ class FlashbangActionKeyBlocker:
         Continuously clamps volume to 100% and keeps unmuted every 20ms.
         """
         ole32.CoInitialize(None)
-        while self.is_active:
-            # Check if flashbang audio is done
-            if not is_flashbang_audio_playing():
-                break
+        try:
+            while self.is_active:
+                # Check if flashbang audio is done
+                if not is_flashbang_audio_playing():
+                    break
 
-            # Clamping: override any attempt to lower volume or mute
-            if self.audio_ctrl is not None:
-                try:
-                    vol = self.audio_ctrl.get_volume()
-                    if vol < 0.99:
-                        self.audio_ctrl.set_volume(1.0)
-                    if self.audio_ctrl.get_mute():
-                        self.audio_ctrl.set_mute(False)
-                except Exception:
-                    pass
+                # Clamping: override any attempt to lower volume or mute
+                if self.audio_ctrl is not None:
+                    try:
+                        vol = self.audio_ctrl.get_volume()
+                        if vol < 0.99:
+                            self.audio_ctrl.set_volume(1.0)
+                        if self.audio_ctrl.get_mute():
+                            self.audio_ctrl.set_mute(False)
+                    except Exception:
+                        pass
 
-            time.sleep(0.02)
+                time.sleep(0.02)
+        finally:
+            try:
+                ole32.CoUninitialize()
+            except Exception:
+                pass
 
         # Once audio finishes or stop requested, clean up
         self.stop()

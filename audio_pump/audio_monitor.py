@@ -126,59 +126,65 @@ class AudioHazardMonitor:
         ole32.CoInitialize(None)
         print("[AudioHazard] Audio monitor thread active.")
 
-        while self._running:
-            # If hazard evaluation is suppressed (e.g. flashbang audio is playing),
-            # do not clamp volume to 0 or evaluate drops
-            if self.is_suppressed():
-                time.sleep(0.05)
-                continue
+        try:
+            while self._running:
+                # If hazard evaluation is suppressed (e.g. flashbang audio is playing),
+                # do not clamp volume to 0 or evaluate drops
+                if self.is_suppressed():
+                    time.sleep(0.05)
+                    continue
 
-            # When hazard is active, poll fast (~30ms) to aggressively clamp volume
-            # against taskbar sliders or mixer tampering
-            if self.is_hazard_active:
-                time.sleep(0.03)
+                # When hazard is active, poll fast (~30ms) to aggressively clamp volume
+                # against taskbar sliders or mixer tampering
+                if self.is_hazard_active:
+                    time.sleep(0.03)
+                    try:
+                        actual_vol = self.audio_ctrl.get_volume()
+                        # If any external means tried to raise volume higher than pump progress, clamp it!
+                        if actual_vol > self.allowed_volume_scalar + 0.005:
+                            self.audio_ctrl.set_volume(self.allowed_volume_scalar)
+                    except Exception:
+                        pass
+                    continue
+
+                time.sleep(AUDIO_POLL_INTERVAL)
+
+                now = time.time()
+                if now - self.last_restored_time < self.cooldown_seconds:
+                    continue
+
+                if self.is_suppressed():
+                    continue
+
                 try:
-                    actual_vol = self.audio_ctrl.get_volume()
-                    # If any external means tried to raise volume higher than pump progress, clamp it!
-                    if actual_vol > self.allowed_volume_scalar + 0.005:
-                        self.audio_ctrl.set_volume(self.allowed_volume_scalar)
-                except Exception:
-                    pass
-                continue
+                    peak = self.audio_ctrl.get_peak_value()
+                    current_vol = self.audio_ctrl.get_volume()
 
-            time.sleep(AUDIO_POLL_INTERVAL)
+                    if peak > AUDIO_PEAK_THRESHOLD and current_vol > 0.02:
+                        if self.is_suppressed():
+                            continue
 
-            now = time.time()
-            if now - self.last_restored_time < self.cooldown_seconds:
-                continue
+                        roll = random.random()
+                        print(
+                            f"[AudioHazard] Sound detected! Peak: {peak:.3f}, Vol: {current_vol:.2f} | Roll: {roll:.3f} vs {self.drop_chance}"
+                        )
 
-            if self.is_suppressed():
-                continue
+                        if roll < self.drop_chance:
+                            print("[AudioHazard] 80% HIT! Dropping volume to 0!")
+                            self.is_hazard_active = True
+                            self.allowed_volume_scalar = 0.0
+                            self.audio_ctrl.set_volume(0.0)
 
+                            if self.on_drop_callback:
+                                self.on_drop_callback()
+                            else:
+                                self.key_blocker.start()
+                        else:
+                            self.last_restored_time = now - (self.cooldown_seconds - 3.0)
+                except Exception as err:
+                    print(f"[AudioHazard] Monitor error: {err}")
+        finally:
             try:
-                peak = self.audio_ctrl.get_peak_value()
-                current_vol = self.audio_ctrl.get_volume()
-
-                if peak > AUDIO_PEAK_THRESHOLD and current_vol > 0.02:
-                    if self.is_suppressed():
-                        continue
-
-                    roll = random.random()
-                    print(
-                        f"[AudioHazard] Sound detected! Peak: {peak:.3f}, Vol: {current_vol:.2f} | Roll: {roll:.3f} vs {self.drop_chance}"
-                    )
-
-                    if roll < self.drop_chance:
-                        print("[AudioHazard] 80% HIT! Dropping volume to 0!")
-                        self.is_hazard_active = True
-                        self.allowed_volume_scalar = 0.0
-                        self.audio_ctrl.set_volume(0.0)
-                        # Block hardware volume keys
-                        self.key_blocker.start()
-
-                        if self.on_drop_callback:
-                            self.on_drop_callback()
-                    else:
-                        self.last_restored_time = now - (self.cooldown_seconds - 3.0)
-            except Exception as err:
-                print(f"[AudioHazard] Monitor error: {err}")
+                ole32.CoUninitialize()
+            except Exception:
+                pass

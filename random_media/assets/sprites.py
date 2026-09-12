@@ -10,10 +10,6 @@ import math
 from typing import List, Optional
 from PIL import Image, ImageDraw, ImageTk
 
-_cat_photo: Optional[ImageTk.PhotoImage] = None
-_rat_photos: List[ImageTk.PhotoImage] = []
-_furby_photo: Optional[ImageTk.PhotoImage] = None
-
 
 def create_cat_image(size: int = 44) -> Image.Image:
     """Renders the unhinged manic goblin cat with alpha transparency."""

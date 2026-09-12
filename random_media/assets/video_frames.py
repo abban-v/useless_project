@@ -143,10 +143,8 @@ def load_media_pil_frames(
                     for idx, frame in enumerate(ImageSequence.Iterator(gif_img)):
                         if len(frames) >= max_frames:
                             break
-                        # Sample frames if long GIF
-                        if idx % 1 == 0:
-                            fitted = _fit_image_to_frame(frame, target_width, target_height)
-                            frames.append(fitted)
+                        fitted = _fit_image_to_frame(frame, target_width, target_height)
+                        frames.append(fitted)
             except Exception as err:
                 print(f"[MediaFrames] Error decoding GIF {path_str}: {err}")
 

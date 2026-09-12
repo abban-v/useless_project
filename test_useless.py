@@ -1,11 +1,10 @@
-"""
-Automated test suite for modularized Useless Project components.
-Validates audio_pump, screen_flashbang, and mouse_stamina modules,
-including hardware volume key blocking, action key disabling, and volume clamping.
-"""
-
+import sys
 import unittest
 import tkinter as tk
+from pathlib import Path
+
+# Ensure useless_project root is in sys.path
+sys.path.insert(0, str(Path(__file__).parent.resolve()))
 
 import config
 from audio_pump import WindowsAudioController, AudioHazardMonitor, PumpOverlay, VolumeKeyBlocker
@@ -75,6 +74,15 @@ class TestModularUselessProject(unittest.TestCase):
 
         ctrl.restore_speed()
         self.assertEqual(ctrl._get_current_speed(), initial_speed)
+
+        # Verify chaos click triggering during stamina depletion freeze
+        clicked = []
+        ctrl_click = MouseSpeedController(on_click_callback=lambda: clicked.append(True))
+        ctrl_click.freeze_cursor(400, 400)
+        res = ctrl_click.gesture_blocker._mouse_hook_callback(0, 0x0201, 0)
+        self.assertEqual(res, 1, "Click must remain blocked from OS")
+        self.assertEqual(len(clicked), 1, "Chaos callback must be invoked when user clicks during freeze")
+        ctrl_click.unfreeze_cursor()
 
     def test_05_silence_overlay_ui(self):
         """Verify BIG WHITE TEXT raw Arial overlay creation and update."""
@@ -147,7 +155,7 @@ class TestModularUselessProject(unittest.TestCase):
         from screen_flashbang import play_flashbang_audio, stop_flashbang_audio
         from audio_pump import WindowsAudioController
 
-        mp3 = Path("memes/audioloud.mp3").resolve()
+        mp3 = (Path(__file__).parent / "memes" / "audioloud.mp3").resolve()
         self.assertTrue(mp3.exists(), "audioloud.mp3 must exist in memes folder")
 
         # Test audio playback lifecycle
@@ -447,6 +455,95 @@ class TestModularUselessProject(unittest.TestCase):
             self.assertEqual(player.frames[0].height(), config.CLICK_VIDEO_HEIGHT)
 
         overlay.clear_all()
+        root.destroy()
+
+    def test_14_shoe_game(self):
+        """Verify Shoe Game module: ShoeGameManager, ShoeAudioEnforcer, Real Mode, and Virtual Mode with double scream."""
+        import time
+        from unittest.mock import MagicMock, patch
+        from shoe_game import ShoeGameManager, ShoeAudioEnforcer, RealShoeGame, VirtualShoeGame
+        from shoe_game.virtual_mode import Hurdle
+        import config
+
+        # 1. Config validation
+        self.assertEqual(config.SHOE_GAME_INTERVAL_SECONDS, 60.0)
+        self.assertEqual(config.SHOE_GAME_CHANCE, 0.40)
+        self.assertEqual(config.SHOE_GAME_REAL_MODE_SECONDS, 10.0)
+        self.assertEqual(config.SHOE_GAME_SCREAM_SECONDS, 3.0)
+
+        # 2. ShoeAudioEnforcer safety keys and lock
+        ctrl = WindowsAudioController()
+        enforcer = ShoeAudioEnforcer(ctrl)
+        self.assertNotIn(0x77, enforcer.BLOCKED_KEYS, "F8 must NOT be blocked by ShoeAudioEnforcer!")
+        self.assertNotIn(0x11, enforcer.BLOCKED_KEYS, "Ctrl must NOT be blocked!")
+        self.assertNotIn(0x10, enforcer.BLOCKED_KEYS, "Shift must NOT be blocked!")
+        self.assertNotIn(0x51, enforcer.BLOCKED_KEYS, "Q must NOT be blocked!")
+        self.assertIn(0xAE, enforcer.BLOCKED_KEYS, "Volume Down must be blocked!")
+        self.assertIn(0xAD, enforcer.BLOCKED_KEYS, "Volume Mute must be blocked!")
+
+        # 3. VirtualShoeGame Irony & Double Scream Verification
+        root = tk.Tk()
+        root.withdraw()
+
+        with patch.object(enforcer, "play_double_scream") as mock_double_scream:
+            virtual_game = VirtualShoeGame(root, audio_ctrl=ctrl, duration_seconds=5.0)
+            virtual_game.audio_enforcer = enforcer
+            virtual_game.withdraw()
+
+            # Verify initial state
+            initial_speed = virtual_game.hurdle_speed
+            initial_delay = virtual_game.hurdle_spawn_delay_ms
+            virtual_game.state = "WALKING"
+
+            # Test Irony: Player mashing keys INCREASES hurdle speed and spawn frequency
+            mock_key_event = MagicMock()
+            mock_key_event.char = "a"
+            virtual_game._on_player_key(mock_key_event)
+            self.assertEqual(virtual_game.keys_mashed, 1)
+            self.assertGreater(virtual_game.hurdle_speed, initial_speed)
+            self.assertLess(virtual_game.hurdle_spawn_delay_ms, initial_delay)
+
+            # Test Irony: Player clicking mouse also INCREASES hurdle speed and spawn frequency
+            prev_speed = virtual_game.hurdle_speed
+            mock_click_event = MagicMock()
+            mock_click_event.x = 200
+            mock_click_event.y = 300
+            virtual_game._on_player_click(mock_click_event)
+            self.assertEqual(virtual_game.clicks_count, 1)
+            self.assertGreater(virtual_game.hurdle_speed, prev_speed)
+
+            # Test Hurdle Collision: Stepping on leaf triggers play_double_scream(duration=3.0)
+            test_hurdle = Hurdle("leaf", x=virtual_game.shoe_x, y=virtual_game.shoe_y, w=40, h=25)
+            virtual_game.hurdles = [test_hurdle]
+            virtual_game._update_hurdles(time.time())
+
+            self.assertTrue(test_hurdle.stepped, "Hurdle must be marked stepped upon shoe collision")
+            self.assertEqual(virtual_game.leaves_crushed, 1)
+            mock_double_scream.assert_called_with(duration=3.0)
+
+            virtual_game.dismiss()
+
+        # 4. RealShoeGame Verification
+        with patch.object(ShoeAudioEnforcer, "play_all_music"):
+            real_game = RealShoeGame(root, audio_ctrl=ctrl, duration_seconds=1.0)
+            real_game.withdraw()
+            self.assertTrue(real_game.canvas.winfo_exists())
+            real_game.dismiss()
+
+        # 5. ShoeGameManager Verification
+        mgr = ShoeGameManager(root, ctrl)
+        mgr.start()
+        self.assertTrue(mgr.is_running)
+        self.assertIsNotNone(mgr._timer_id)
+
+        # Test manual launch
+        with patch.object(ShoeAudioEnforcer, "play_all_music"):
+            mgr.launch_game("real")
+            self.assertIsNotNone(mgr.active_game)
+            mgr.stop()
+            self.assertFalse(mgr.is_running)
+            self.assertIsNone(mgr.active_game)
+
         root.destroy()
 
 

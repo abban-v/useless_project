@@ -11,6 +11,8 @@ import random
 import ctypes
 import tkinter as tk
 from typing import List, Dict, Any, Optional
+import win32gui
+import win32con
 
 from config import (
     CLICK_CAT_COUNT,
@@ -125,12 +127,19 @@ class ChaosOverlay:
         self.toplevel.lift()
         self.toplevel.update_idletasks()
 
-        # Set WS_EX_TRANSPARENT (0x00000020) on parent wrapper HWND ONLY.
-        parent_hwnd = user32.GetParent(self.toplevel.winfo_id())
+        # Set WS_EX_TRANSPARENT on parent wrapper HWND cleanly via win32gui (64-bit safe)
+        parent_hwnd = win32gui.GetParent(self.toplevel.winfo_id())
         target_hwnd = parent_hwnd if parent_hwnd else self.toplevel.winfo_id()
-        style = user32.GetWindowLongW(target_hwnd, -20)
-        user32.SetWindowLongW(target_hwnd, -20, style | 0x00000020)
-        user32.SetWindowPos(target_hwnd, 0, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0004 | 0x0020)
+        styles = win32gui.GetWindowLong(target_hwnd, win32con.GWL_EXSTYLE)
+        win32gui.SetWindowLong(
+            target_hwnd,
+            win32con.GWL_EXSTYLE,
+            styles
+            | win32con.WS_EX_LAYERED
+            | win32con.WS_EX_TRANSPARENT
+            | win32con.WS_EX_TOOLWINDOW
+            | win32con.WS_EX_NOACTIVATE,
+        )
 
         self.canvas = tk.Canvas(
             self.toplevel,
@@ -372,7 +381,7 @@ class ChaosOverlay:
             # 3. Update Video Players Animation (every 2 ticks = ~50ms per video frame)
             if self._rat_anim_tick % 2 == 0 and self.video_players:
                 for vp in self.video_players:
-                    if vp.frames:
+                    if vp.frames and len(vp.frames) > 1:
                         vp.frame_idx = (vp.frame_idx + 1) % len(vp.frames)
                         self.canvas.itemconfig(vp.img_id, image=vp.frames[vp.frame_idx])
 
