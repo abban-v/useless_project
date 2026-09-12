@@ -1,7 +1,7 @@
 """
 Shoe Game Module for Useless Project.
 Coordinates periodic 40% chance fullscreen shoe game launches:
-- Virtual Mode: 2D front view shoerack, leg step-in scream, 'SAVE THE LEAF!' walking simulation,
+- Virtual Mode: 2D front view shoerack, leg step-in scream, 'SAVE THE SHOE!' walking simulation,
   hurdle frequency acceleration upon player key/click mashing, and double scream collisions.
 - Real Mode: Pitch-black fullscreen window with 'shoes can't think' blasted with music tracks for 10s.
 """

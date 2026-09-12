@@ -2,7 +2,7 @@
 Choice Screen for Shoe Game Module.
 Displays a fullscreen, non-closable selection interface with heading "SHOE GAME".
 Allows player to choose between:
-- Virtual Mode: 'SAVE THE LEAF!' 2D side-scrolling comic hurdle journey
+- Virtual Mode: 'SAVE THE SHOE!' 2D side-scrolling comic hurdle journey
 - Real Mode: 'shoes can't think' 10-second audio blast in the void
 No exit button is provided; the player must pick a mode to proceed.
 """
@@ -145,7 +145,7 @@ class ShoeGameChoiceScreen(tk.Toplevel):
             mode="virtual",
             rect=self._card_rects["virtual"],
             title="[1] VIRTUAL MODE",
-            subtitle="SAVE THE LEAF!",
+            subtitle="SAVE THE SHOE!",
             desc="2D comic shoerack pan, leg intrusion, and\nfrantic walking road hurdles.\nMash keys to 'control' the shoe\n(it actually accelerates the garbage).\nDouble screams on hurdle collision!",
             accent_color="#FF3366",
             is_hover=(hover_mode == "virtual"),

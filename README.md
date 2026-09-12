@@ -43,14 +43,14 @@ To that we say, welcome to computer science, where we make stuff up for the sake
   - `win32gui` / `win32con` extended window styles (`WS_EX_TRANSPARENT`, `WS_EX_LAYERED`, `WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`) for click-through floating cursor HUD.
 - **GUI Framework**: Tkinter (custom canvas rendering and procedural alpha animations)
 - **Audio Synthesizer**: Pure standard library procedural WAV generator (`wave`, `struct`, `math`) for offline sound effects (Explosion BOOM, air pump hiss, victory chime).
-
+-- **Unique value**: Probably the first 12 hour useless project to have deprecated features that still exist in the code but weren't used.
 ### Implementation
 
 # Installation
 ```powershell
 git clone <repo-url>
 cd useless_project
-pip install pywin32
+pip install -r requirements.txt
 ```
 
 # Run
@@ -59,26 +59,15 @@ pip install pywin32
 python main.py
 ```
 
-# Run Test Suite
-```powershell
-python test_useless.py
-```
-
 ### Project Documentation
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
-
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
-
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+![Screenshot1](screenshot.jpg)
+*The least that can happen*
 
 # Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Add caption explaining your workflow*
+![Workflow](Flowchart.jpg)
+*Wow, it must be so complex*
 
 ### Project Demo
 # Video

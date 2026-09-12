@@ -2,7 +2,7 @@
 Shoe Game Manager for Shoe Game Module.
 Periodically (every 60s) rolls a 40% chance to launch the non-closable fullscreen Shoe Game.
 Randomly alternates between:
-- Virtual Mode: 2D comic shoerack pan, leg intrusion, scream, and 'SAVE THE LEAF!' walking hurdles.
+- Virtual Mode: 2D comic shoerack pan, leg intrusion, scream, and 'SAVE THE SHOE!' walking hurdles.
 - Real Mode: Pitch-black window with 'shoes can't think' blasted with music tracks for 10s.
 """
 
