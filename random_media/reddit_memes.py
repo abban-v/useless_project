@@ -93,7 +93,7 @@ class RedditMemeFetcher:
         with self._lock:
             self._cached_items.clear()
             for media_file in self.cache_dir.iterdir():
-                if media_file.is_file() and media_file.suffix.lower() in ALL_VALID_EXTS:
+                if media_file.is_file() and not media_file.name.startswith("tmp_") and media_file.suffix.lower() in ALL_VALID_EXTS:
                     rel_name = media_file.name
                     meta = metadata.get(rel_name, {})
                     title = meta.get("title", media_file.stem.replace("_", " "))
@@ -120,12 +120,14 @@ class RedditMemeFetcher:
         print(f"[RedditMemes] Loaded {len(self._cached_items)} cached memes from {self.cache_dir}")
 
     def _save_metadata(self):
-        """Persists metadata to metadata.json."""
+        """Persists metadata to metadata.json atomically."""
         with self._lock:
             data = {k: v.to_dict() for k, v in self._cached_items.items()}
         try:
-            with open(self.metadata_path, "w", encoding="utf-8") as f:
+            temp_file = self.metadata_path.with_suffix(".tmp")
+            with open(temp_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
+            temp_file.replace(self.metadata_path)
         except Exception as err:
             print(f"[RedditMemes] Failed saving metadata: {err}")
 

@@ -38,6 +38,8 @@ class RealShoeGame(tk.Toplevel):
         self.geometry(f"{self.screen_w}x{self.screen_h}+0+0")
         self.overrideredirect(True)
         self.wm_attributes("-topmost", True)
+        self.lift()
+        self.focus_force()
         self.configure(bg="#000000")
 
         self.canvas = tk.Canvas(
@@ -48,6 +50,7 @@ class RealShoeGame(tk.Toplevel):
             highlightthickness=0,
         )
         self.canvas.pack(fill="both", expand=True)
+        self.canvas.focus_set()
 
         self._block_closing()
         self._render_stupid_text()

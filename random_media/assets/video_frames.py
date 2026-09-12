@@ -22,6 +22,7 @@ except ImportError:
 MEMES_DIR = Path(__file__).parent.parent.parent / "memes"
 DEFAULT_VID = MEMES_DIR / "explosionvideo.mp4"
 
+MAX_MEDIA_FRAME_CACHE = 20
 _cached_media_pil_frames: Dict[str, List[Image.Image]] = {}
 _lock = threading.Lock()
 
@@ -129,7 +130,10 @@ def load_media_pil_frames(
 
     with _lock:
         if cache_key in _cached_media_pil_frames and _cached_media_pil_frames[cache_key]:
-            return _cached_media_pil_frames[cache_key]
+            # Move to end (most recently used)
+            val = _cached_media_pil_frames.pop(cache_key)
+            _cached_media_pil_frames[cache_key] = val
+            return val
 
     frames: List[Image.Image] = []
     p = Path(path_str)
@@ -184,6 +188,9 @@ def load_media_pil_frames(
             frames.append(img)
 
     with _lock:
+        while len(_cached_media_pil_frames) >= MAX_MEDIA_FRAME_CACHE:
+            oldest_key = next(iter(_cached_media_pil_frames))
+            _cached_media_pil_frames.pop(oldest_key, None)
         _cached_media_pil_frames[cache_key] = frames
 
     return frames

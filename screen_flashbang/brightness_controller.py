@@ -67,6 +67,21 @@ def set_brightness_dxva2(level: int = 100):
             ctypes.POINTER(wintypes.RECT),
             wintypes.LPARAM,
         )
+        user32.EnumDisplayMonitors.argtypes = [wintypes.HDC, ctypes.c_void_p, MONITORENUMPROC, wintypes.LPARAM]
+        user32.EnumDisplayMonitors.restype = wintypes.BOOL
+
+        dxva2.GetNumberOfPhysicalMonitorsFromHMONITOR.argtypes = [wintypes.HMONITOR, ctypes.POINTER(wintypes.DWORD)]
+        dxva2.GetNumberOfPhysicalMonitorsFromHMONITOR.restype = wintypes.BOOL
+
+        dxva2.GetPhysicalMonitorsFromHMONITOR.argtypes = [wintypes.HMONITOR, wintypes.DWORD, ctypes.c_void_p]
+        dxva2.GetPhysicalMonitorsFromHMONITOR.restype = wintypes.BOOL
+
+        dxva2.SetMonitorBrightness.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+        dxva2.SetMonitorBrightness.restype = wintypes.BOOL
+
+        dxva2.DestroyPhysicalMonitor.argtypes = [wintypes.HANDLE]
+        dxva2.DestroyPhysicalMonitor.restype = wintypes.BOOL
+
         user32.EnumDisplayMonitors(None, None, MONITORENUMPROC(monitor_enum_proc), 0)
     except Exception:
         pass

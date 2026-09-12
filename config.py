@@ -83,20 +83,19 @@ BAR_Y_OFFSET = -28                # Pixels above the cursor tip
 # 40% chance of a typed letter being randomly changed to an adjacent/different letter
 KEYBOARD_SCRAMBLE_CHANCE = 0.40
 
+# 30% chance on each keyboard click that any sound in music/ folder starts playing
+KEYBOARD_SOUND_CHANCE = 0.30
+
 # ==========================================
 # Click-Triggered Media Chaos
 # ==========================================
-# 60% chance for each chaos event on every click
+# 60% chance for meme popups on every click
 CLICK_CHAOS_CHANCE = 0.60
 
-# 500 tiny bouncing cats
-CLICK_CAT_COUNT = 500
-
-# 50 spinning low-poly rats
-CLICK_RAT_COUNT = 50
-
-# 4 soul-staring corner Furbys
-CLICK_FURBY_COUNT = 4
+# Bouncing cats and spinning rats removed due to issues
+CLICK_CAT_COUNT = 0
+CLICK_RAT_COUNT = 0
+CLICK_FURBY_COUNT = 0
 
 # 60% chance for each music track in music/ folder (except meow.m4a)
 CLICK_MUSIC_CHANCE = 0.60
@@ -132,11 +131,11 @@ REDDIT_CLIENT_SECRET = ""
 # ==========================================
 # Shoe Game Hazard
 # ==========================================
-# Periodic check every minute (60s)
-SHOE_GAME_INTERVAL_SECONDS = 60.0
+# Periodic check every minute (30s)
+SHOE_GAME_INTERVAL_SECONDS = 30.0
 
-# 40% chance of shoe game launching
-SHOE_GAME_CHANCE = 0.40
+# Chance of shoe game launching on each periodic check (60% default)
+SHOE_GAME_CHANCE = 0.60
 
 # Duration of Real Mode ("shoes can't think") in seconds
 SHOE_GAME_REAL_MODE_SECONDS = 10.0

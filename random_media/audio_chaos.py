@@ -162,6 +162,27 @@ class ChaosAudioEngine:
                 print(f"[ChaosAudio] Track 60% HIT: Playing {track_path.name} ({duration:.1f}s, roll: {roll:.2f})")
                 self.play_track(str(track_path.resolve()), duration, is_music=True)
 
+    def play_random_sound(self):
+        """
+        Picks any sound from the music/ folder at random and starts playing it.
+        Triggered with 30% chance on each keyboard click.
+        """
+        if not MUSIC_DIR.exists():
+            return
+
+        valid_exts = {".m4a", ".mp3", ".wav", ".aac", ".ogg"}
+        tracks = [
+            p for p in MUSIC_DIR.iterdir()
+            if p.is_file() and p.suffix.lower() in valid_exts
+        ]
+        if not tracks:
+            return
+
+        track_path = random.choice(tracks)
+        duration = get_track_duration(str(track_path.resolve()))
+        print(f"[ChaosAudio] Keyboard 30% HIT: Playing {track_path.name} ({duration:.1f}s)")
+        self.play_track(str(track_path.resolve()), duration, is_music=True)
+
     def is_chaos_audio_playing(self) -> bool:
         """Returns True if any chaos track or meow is currently active."""
         if self._active_players:

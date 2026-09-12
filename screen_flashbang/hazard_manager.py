@@ -12,7 +12,7 @@ import random
 import tkinter as tk
 from typing import Callable, List, Optional
 
-from config import HAZARD_INTERVAL_SECONDS, FLASHBANG_CHANCE
+import config
 from screen_flashbang.flashbang_overlay import FlashbangOverlay
 from screen_flashbang.brightness_controller import force_maximum_brightness
 from screen_flashbang.audio_player import play_flashbang_audio
@@ -22,15 +22,26 @@ from screen_flashbang.action_key_blocker import FlashbangActionKeyBlocker
 class HazardManager:
     """
     Coordinates periodic random hazards.
-    Checks every minute (60s) for a 60% chance to trigger an active hazard.
+    Dynamically tracks chance and interval settings.
     """
 
-    def __init__(self, root: tk.Tk, audio_ctrl=None, audio_monitor=None, pump_overlay=None):
+    def __init__(
+        self,
+        root: tk.Tk,
+        audio_ctrl=None,
+        audio_monitor=None,
+        pump_overlay=None,
+        chance: Optional[float] = None,
+        interval_seconds: Optional[float] = None,
+    ):
         self.root = root
         self.audio_ctrl = audio_ctrl
         self.audio_monitor = audio_monitor
         self.pump_overlay = pump_overlay
+        self._custom_chance = chance
+        self._custom_interval = interval_seconds
         self.is_running = False
+        self._timer_id: Optional[str] = None
 
         # Lazy load audio_ctrl if not provided
         if self.audio_ctrl is None:
@@ -48,15 +59,49 @@ class HazardManager:
             self.trigger_flashbang,
         ]
 
-    def start(self):
+    @property
+    def chance(self) -> float:
+        if self._custom_chance is not None:
+            return float(self._custom_chance)
+        return float(getattr(config, "FLASHBANG_CHANCE", 0.70))
+
+    @chance.setter
+    def chance(self, val: float):
+        self._custom_chance = float(val)
+
+    @property
+    def interval_seconds(self) -> float:
+        if self._custom_interval is not None:
+            return float(self._custom_interval)
+        return float(getattr(config, "HAZARD_INTERVAL_SECONDS", 30.0))
+
+    @interval_seconds.setter
+    def interval_seconds(self, val: float):
+        self._custom_interval = float(val)
+
+    def start(self, initial_delay_seconds: Optional[float] = None):
         self.is_running = True
-        self._schedule_next_check()
+        if initial_delay_seconds is not None:
+            delay = initial_delay_seconds
+        elif self.chance >= 1.0:
+            delay = 1.5  # Immediate prompt check for 100% testing
+        else:
+            delay = self.interval_seconds
+
+        self._schedule_next_check(delay_seconds=delay)
         print(
-            f"[HazardManager] Periodic hazard timer started (every {HAZARD_INTERVAL_SECONDS}s, {int(FLASHBANG_CHANCE * 100)}% chance)."
+            f"[HazardManager] Periodic hazard timer started (every {self.interval_seconds}s, {int(self.chance * 100)}% chance)."
         )
 
     def stop(self):
         self.is_running = False
+        if self._timer_id is not None:
+            try:
+                self.root.after_cancel(self._timer_id)
+            except Exception:
+                pass
+            self._timer_id = None
+
         if hasattr(self, "key_blocker"):
             self.key_blocker.stop()
 
@@ -64,20 +109,22 @@ class HazardManager:
         """Allows registering future hazards into the pool."""
         self.hazard_registry.append(hazard_func)
 
-    def _schedule_next_check(self):
+    def _schedule_next_check(self, delay_seconds: Optional[float] = None):
         if not self.is_running:
             return
-        interval_ms = int(HAZARD_INTERVAL_SECONDS * 1000)
-        self.root.after(interval_ms, self._evaluate_hazard)
+        sec = delay_seconds if delay_seconds is not None else self.interval_seconds
+        interval_ms = max(100, int(sec * 1000))
+        self._timer_id = self.root.after(interval_ms, self._evaluate_hazard)
 
     def _evaluate_hazard(self):
         if not self.is_running:
             return
 
+        cur_chance = self.chance
         roll = random.random()
-        print(f"[HazardManager] Minute check: roll {roll:.3f} vs chance {FLASHBANG_CHANCE}")
+        print(f"[HazardManager] Periodic check: roll {roll:.3f} vs chance {cur_chance:.2f}")
 
-        if roll < FLASHBANG_CHANCE and self.hazard_registry:
+        if (roll < cur_chance or cur_chance >= 1.0) and self.hazard_registry:
             selected_hazard = random.choice(self.hazard_registry)
             print(f"[HazardManager] Triggering hazard: {selected_hazard.__name__}")
             selected_hazard()

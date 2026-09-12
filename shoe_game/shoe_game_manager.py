@@ -10,7 +10,7 @@ import random
 import tkinter as tk
 from typing import Optional
 
-from config import SHOE_GAME_INTERVAL_SECONDS, SHOE_GAME_CHANCE
+import config
 from shoe_game.virtual_mode import VirtualShoeGame
 from shoe_game.real_mode import RealShoeGame
 
@@ -18,21 +18,62 @@ from shoe_game.real_mode import RealShoeGame
 class ShoeGameManager:
     """
     Coordinates periodic evaluation and spawning of the Shoe Game.
+    Dynamically tracks chance and interval settings.
     """
 
-    def __init__(self, root: tk.Tk, audio_ctrl=None):
+    def __init__(
+        self,
+        root: tk.Tk,
+        audio_ctrl=None,
+        audio_monitor=None,
+        pump_overlay=None,
+        chance: Optional[float] = None,
+        interval_seconds: Optional[float] = None,
+    ):
         self.root = root
         self.audio_ctrl = audio_ctrl
+        self.audio_monitor = audio_monitor
+        self.pump_overlay = pump_overlay
+        self._custom_chance = chance
+        self._custom_interval = interval_seconds
         self.is_running = False
         self.active_game = None
         self._timer_id: Optional[str] = None
 
-    def start(self):
-        """Starts periodic 60-second evaluation checks."""
+    @property
+    def chance(self) -> float:
+        if self._custom_chance is not None:
+            return float(self._custom_chance)
+        return float(getattr(config, "SHOE_GAME_CHANCE", 0.40))
+
+    @chance.setter
+    def chance(self, val: float):
+        self._custom_chance = float(val)
+
+    @property
+    def interval_seconds(self) -> float:
+        if self._custom_interval is not None:
+            return float(self._custom_interval)
+        return float(getattr(config, "SHOE_GAME_INTERVAL_SECONDS", 60.0))
+
+    @interval_seconds.setter
+    def interval_seconds(self, val: float):
+        self._custom_interval = float(val)
+
+    def start(self, initial_delay_seconds: Optional[float] = None):
+        """Starts periodic evaluation checks."""
         self.is_running = True
-        self._schedule_check()
+        if initial_delay_seconds is not None:
+            delay = initial_delay_seconds
+        elif self.chance >= 1.0:
+            # Immediate testing convenience: launch within 1.5 seconds instead of waiting 60 seconds
+            delay = 1.5
+        else:
+            delay = self.interval_seconds
+
+        self._schedule_check(delay_seconds=delay)
         print(
-            f"[ShoeGameManager] Periodic Shoe Game timer started (every {SHOE_GAME_INTERVAL_SECONDS}s, {int(SHOE_GAME_CHANCE * 100)}% chance)."
+            f"[ShoeGameManager] Periodic Shoe Game timer started (every {self.interval_seconds}s, {int(self.chance * 100)}% chance)."
         )
 
     def stop(self):
@@ -52,10 +93,11 @@ class ShoeGameManager:
                 pass
             self.active_game = None
 
-    def _schedule_check(self):
+    def _schedule_check(self, delay_seconds: Optional[float] = None):
         if not self.is_running:
             return
-        interval_ms = int(SHOE_GAME_INTERVAL_SECONDS * 1000)
+        sec = delay_seconds if delay_seconds is not None else self.interval_seconds
+        interval_ms = max(100, int(sec * 1000))
         self._timer_id = self.root.after(interval_ms, self._evaluate_roll)
 
     def _evaluate_roll(self):
@@ -67,10 +109,11 @@ class ShoeGameManager:
             self._schedule_check()
             return
 
+        cur_chance = self.chance
         roll = random.random()
-        print(f"[ShoeGameManager] Minute check: roll {roll:.3f} vs chance {SHOE_GAME_CHANCE}")
+        print(f"[ShoeGameManager] Minute check: roll {roll:.3f} vs chance {cur_chance:.2f}")
 
-        if roll < SHOE_GAME_CHANCE:
+        if roll < cur_chance or cur_chance >= 1.0:
             mode = "virtual" if random.random() < 0.5 else "real"
             self.launch_game(mode)
 
@@ -81,7 +124,27 @@ class ShoeGameManager:
         if self.active_game is not None:
             return
 
-        print(f"[ShoeGameManager] 40% HIT! Launching Shoe Game in [{mode.upper()} MODE] fullscreen!")
+        cur_chance = self.chance
+        print(f"[ShoeGameManager] {int(cur_chance * 100)}% HIT! Launching Shoe Game in [{mode.upper()} MODE] fullscreen!")
+
+        # Suppress audio monitor and dismiss pump overlay so shoe audio plays without triggering pump volume drops
+        if self.audio_monitor is not None:
+            suppress_dur = (
+                getattr(config, "SHOE_GAME_VIRTUAL_MODE_SECONDS", 20.0) + 5.0
+                if mode == "virtual"
+                else getattr(config, "SHOE_GAME_REAL_MODE_SECONDS", 10.0) + 5.0
+            )
+            try:
+                self.audio_monitor.suppress_for(suppress_dur)
+                self.audio_monitor.dismiss_hazard()
+            except Exception:
+                pass
+
+        if self.pump_overlay is not None:
+            try:
+                self.pump_overlay.dismiss()
+            except Exception:
+                pass
 
         if mode == "virtual":
             self.active_game = VirtualShoeGame(
@@ -95,6 +158,12 @@ class ShoeGameManager:
                 audio_ctrl=self.audio_ctrl,
                 on_finish=self._on_game_finished,
             )
+
+    def force_launch(self, mode: Optional[str] = None):
+        """Convenience method to immediately trigger shoe game without waiting."""
+        if mode is None:
+            mode = "virtual" if random.random() < 0.5 else "real"
+        self.launch_game(mode)
 
     def _on_game_finished(self):
         self.active_game = None

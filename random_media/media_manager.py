@@ -11,7 +11,8 @@ import random
 import tkinter as tk
 from typing import Optional
 
-from config import CLICK_CHAOS_CHANCE, CLICK_MUSIC_CHANCE
+import config
+from config import CLICK_CHAOS_CHANCE, CLICK_MUSIC_CHANCE, KEYBOARD_SOUND_CHANCE
 from random_media.audio_chaos import ChaosAudioEngine
 from random_media.chaos_overlay import ChaosOverlay
 from random_media.click_listener import ClickListener
@@ -36,7 +37,7 @@ class MediaChaosManager:
         self.is_running = True
         self.meme_fetcher.start_background_worker()
         self.listener.start()
-        print("[MediaChaosManager] Click Chaos Engine ACTIVE (60% event chances on every click).")
+        print("[MediaChaosManager] Click Chaos Engine ACTIVE (memes on click, 30% sounds on key press).")
 
     def stop(self):
         """Cleanly stops listener, meme worker, halts all audio, and destroys overlay."""
@@ -55,41 +56,37 @@ class MediaChaosManager:
         self.root.after(0, self._evaluate_click_chaos)
 
     def _evaluate_click_chaos(self):
-        """Evaluates independent 60% chances for each chaos event."""
+        """Evaluates 60% chance for meme frames and ambient music on click (cats & rats removed)."""
         if not self.is_running:
             return
 
-        cat_hit = False
-        rat_hit = False
-        furby_hit = False
-
-        # 1. 60% Chance for 500 Tiny Bouncing Cats
-        cat_roll = random.random()
-        if cat_roll < CLICK_CHAOS_CHANCE:
-            print(f"[MediaChaos] 60% CATS HIT! (roll: {cat_roll:.3f}) Spawning 500 bouncing cats...")
-            self.overlay.spawn_cats()
-            cat_hit = True
-
-        # 2. 60% Chance for 50 Spinning Low-Poly Rats
-        rat_roll = random.random()
-        if rat_roll < CLICK_CHAOS_CHANCE:
-            print(f"[MediaChaos] 60% RATS HIT! (roll: {rat_roll:.3f}) Spawning 50 spinning rats...")
-            self.overlay.spawn_rats()
-            rat_hit = True
-
-        # 3. 60% Chance for 4 Corner Furbys
-        furby_roll = random.random()
-        if furby_roll < CLICK_CHAOS_CHANCE:
-            print(f"[MediaChaos] 60% FURBYS HIT! (roll: {furby_roll:.3f}) Spawning 4 corner Furbys...")
-            self.overlay.spawn_furbys()
-            furby_hit = True
-
-        # 4. 2-5 Small Rectangular Video Frames (only active if cats, rats, or furbys are active)
-        if cat_hit or rat_hit or furby_hit or self.overlay.has_active_visuals():
+        # 1. 60% Chance for 2-5 Small Rectangular Meme/Video Frames
+        meme_roll = random.random()
+        chance = getattr(config, "CLICK_CHAOS_CHANCE", CLICK_CHAOS_CHANCE)
+        if meme_roll < chance:
+            print(f"[MediaChaos] {int(chance * 100)}% MEMES HIT! (roll: {meme_roll:.3f}) Spawning meme frames...")
             self.overlay.spawn_video_frames()
 
-        # 5. Independent 60% Chance for each music track in music/ (excluding meow.m4a)
-        self.audio_engine.roll_music_chaos(CLICK_MUSIC_CHANCE)
+        # 2. Independent 60% Chance for each music track in music/ (excluding meow.m4a)
+        music_chance = getattr(config, "CLICK_MUSIC_CHANCE", CLICK_MUSIC_CHANCE)
+        self.audio_engine.roll_music_chaos(music_chance)
+
+    def _on_keyboard_key(self):
+        """Dispatched from keyboard hook when a typing key is clicked."""
+        if not self.is_running:
+            return
+        # Post to Tkinter root event loop
+        self.root.after(0, self._evaluate_keyboard_chaos)
+
+    def _evaluate_keyboard_chaos(self):
+        """30% chance on each keyboard click to play any sound in music/ folder."""
+        if not self.is_running:
+            return
+
+        kb_chance = getattr(config, "KEYBOARD_SOUND_CHANCE", KEYBOARD_SOUND_CHANCE)
+        roll = random.random()
+        if roll < kb_chance:
+            self.audio_engine.play_random_sound()
 
 
     def is_chaos_audio_playing(self) -> bool:

@@ -234,7 +234,7 @@ class ShoeAudioEnforcer:
         if not MUSIC_DIR.exists():
             return
 
-        valid_exts = {".m4a", ".mp3", ".wav"}
+        valid_exts = {".m4a", ".mp3", ".wav", ".aac", ".ogg"}
         tracks = [p for p in MUSIC_DIR.iterdir() if p.is_file() and p.suffix.lower() in valid_exts]
 
         players = []

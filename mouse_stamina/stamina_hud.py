@@ -89,6 +89,12 @@ class MouseStaminaHUD(tk.Toplevel):
         self.last_time = time.time()
         self.hwnd = None
 
+        self.last_drawn_stamina = -1.0
+        self.last_drawn_state = None
+        self.last_win_x = -99999
+        self.last_win_y = -99999
+        self._tick_id = None
+
         self._build_canvas()
         self._init_win32_styles()
         self._tick()
@@ -134,6 +140,16 @@ class MouseStaminaHUD(tk.Toplevel):
         )
 
     def _draw_bar(self):
+        current_state = (self.is_exhausted, self.exhausted_pulse)
+        if (
+            self.last_drawn_state == current_state
+            and abs(self.stamina - self.last_drawn_stamina) < 0.2
+        ):
+            return
+
+        self.last_drawn_stamina = self.stamina
+        self.last_drawn_state = current_state
+
         self.canvas.delete("all")
 
         x0, y0 = 6, 11
@@ -241,17 +257,41 @@ class MouseStaminaHUD(tk.Toplevel):
         win_x = cur_x - (self.win_width // 2)
         win_y = cur_y + BAR_Y_OFFSET
 
-        if self.hwnd:
-            SetWindowPos(
-                self.hwnd,
-                HWND_TOPMOST,
-                win_x,
-                win_y,
-                0,
-                0,
-                SWP_NOSIZE | SWP_NOACTIVATE,
-            )
-        else:
-            self.geometry(f"+{win_x}+{win_y}")
+        if win_x != self.last_win_x or win_y != self.last_win_y:
+            self.last_win_x = win_x
+            self.last_win_y = win_y
+            if self.hwnd:
+                SetWindowPos(
+                    self.hwnd,
+                    HWND_TOPMOST,
+                    win_x,
+                    win_y,
+                    0,
+                    0,
+                    SWP_NOSIZE | SWP_NOACTIVATE,
+                )
+            else:
+                self.geometry(f"+{win_x}+{win_y}")
 
-        self.after(MOUSE_HUD_TICK_MS, self._tick)
+        self._tick_id = self.after(MOUSE_HUD_TICK_MS, self._tick)
+
+    def cleanup(self):
+        """Cleanly cancels timers, dismisses silence overlay, and destroys the HUD."""
+        if self._tick_id is not None:
+            try:
+                self.after_cancel(self._tick_id)
+            except Exception:
+                pass
+            self._tick_id = None
+
+        if self.silence_overlay and self.silence_overlay.winfo_exists():
+            try:
+                self.silence_overlay.dismiss()
+            except Exception:
+                pass
+            self.silence_overlay = None
+
+        try:
+            self.destroy()
+        except Exception:
+            pass

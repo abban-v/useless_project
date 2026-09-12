@@ -340,9 +340,14 @@ class ChaosOverlay:
     def _sim_loop(self):
         """Main physics & animation loop running at ~40 FPS (25ms)."""
         if not self._is_simulating or not self.canvas:
+            self._is_simulating = False
             return
 
         try:
+            if not self.toplevel or not self.toplevel.winfo_exists() or not self.has_active_visuals():
+                self._is_simulating = False
+                return
+
             # 1. Update Bouncing Cats Physics
             sw = self.screen_w
             sh = self.screen_h
@@ -387,7 +392,7 @@ class ChaosOverlay:
 
             self.master.after(25, self._sim_loop)
         except Exception:
-            pass
+            self._is_simulating = False
 
     def clear_all(self):
         """Cleans up all entities and destroys the canvas overlay."""

@@ -21,6 +21,7 @@ from config import (
     HAZARD_INTERVAL_SECONDS,
     FLASHBANG_CHANCE,
     KEYBOARD_SCRAMBLE_CHANCE,
+    KEYBOARD_SOUND_CHANCE,
     SHOE_GAME_CHANCE,
     SHOE_GAME_INTERVAL_SECONDS,
 )
@@ -57,8 +58,8 @@ class UselessApp:
         print(f"  * Audio Hazard:    {int(AUDIO_DROP_CHANCE * 100)}% chance on sound -> Volume 0 -> Pump mini-game")
         print(f"  * Visual Hazard:   {int(FLASHBANG_CHANCE * 100)}% chance every {int(HAZARD_INTERVAL_SECONDS)}s -> 100% Brightness Flashbang")
         print(f"  * Mouse Stamina:   Floating HUD above cursor -> Exhaustion freeze & 'ONE MOMENT OF SILENCE'")
-        print(f"  * Keyboard Chaos:  {int(KEYBOARD_SCRAMBLE_CHANCE * 100)}% chance of typed letter swapping (e.g. g -> h)")
-        print(f"  * Click Chaos:     60% chance on click -> 500 Bouncing Cats, 50 Spinning Rats, 4 Furbys & Music")
+        print(f"  * Keyboard Chaos:  {int(KEYBOARD_SCRAMBLE_CHANCE * 100)}% letter swapping & {int(KEYBOARD_SOUND_CHANCE * 100)}% sound on key click")
+        print(f"  * Click Chaos:     60% chance on click -> Rectangular Meme/Video Frames & Concurrent Music")
         print(f"  * Shoe Game:       {int(SHOE_GAME_CHANCE * 100)}% chance every {int(SHOE_GAME_INTERVAL_SECONDS)}s -> Fullscreen Virtual/Real Shoe Chaos")
         print(" Safety:")
         print("  * Press [F8] or [Ctrl + Shift + Q] anywhere to EMERGENCY EXIT & RESTORE!")
@@ -100,14 +101,22 @@ class UselessApp:
         # 6. Keyboard Scrambler (40% letter swapping)
         self.keyboard_scrambler = KeyboardScrambler(chance=KEYBOARD_SCRAMBLE_CHANCE)
 
-        # 7. Click Chaos Engine (500 Cats, 50 Rats, 4 Furbys, Music Chaos)
+        # 7. Click Chaos Engine (Meme Frames, Music Chaos, Keyboard Click Audio)
         self.media_chaos = MediaChaosManager(self.root)
+
+        # Hook keyboard clicks to trigger 30% random sound from music/
+        self.keyboard_scrambler.on_key_callback = self.media_chaos._on_keyboard_key
 
         # Allow clicks during mouse exhaustion freeze to still trigger chaos events
         self.mouse_speed_ctrl.gesture_blocker.on_click_callback = self.media_chaos._on_mouse_click
 
-        # 8. Shoe Game Manager (40% chance every 60s -> Fullscreen Shoe Chaos)
-        self.shoe_game = ShoeGameManager(self.root, self.audio_ctrl)
+        # 8. Shoe Game Manager (Periodic Fullscreen Shoe Chaos)
+        self.shoe_game = ShoeGameManager(
+            self.root,
+            audio_ctrl=self.audio_ctrl,
+            audio_monitor=self.audio_monitor,
+            pump_overlay=self.pump_overlay,
+        )
 
         # 9. Safety Hotkey Thread
         self.is_running = True
@@ -191,6 +200,11 @@ class UselessApp:
         try:
             self.hazard_manager.stop()
             stop_flashbang_audio()
+        except Exception:
+            pass
+
+        try:
+            self.mouse_hud.cleanup()
         except Exception:
             pass
 
