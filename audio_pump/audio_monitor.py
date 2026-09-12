@@ -57,12 +57,16 @@ class AudioHazardMonitor:
     def suppress_for(self, seconds: float):
         """
         Suppresses audio hazard triggers for the given duration in seconds.
-        Ensures program-generated sounds (e.g. flashbang) do not trigger volume drops.
+        Ensures program-generated sounds (e.g. flashbang, ads) do not trigger volume drops.
         """
         target = time.time() + seconds
         if target > self.suppress_until:
             self.suppress_until = target
         print(f"[AudioHazard] Hazard detection suppressed for {seconds:.1f}s (internal audio playing).")
+
+    def suppress_detection(self, seconds: float = 120.0):
+        """Alias for suppress_for to maintain compatibility across modules."""
+        self.suppress_for(seconds)
 
     def is_suppressed(self) -> bool:
         """
@@ -71,6 +75,12 @@ class AudioHazardMonitor:
         """
         if time.time() < self.suppress_until:
             return True
+        try:
+            from random_media.audio_chaos import is_chaos_audio_blocked
+            if is_chaos_audio_blocked():
+                return True
+        except Exception:
+            pass
         try:
             from screen_flashbang import is_flashbang_audio_playing
             if is_flashbang_audio_playing():

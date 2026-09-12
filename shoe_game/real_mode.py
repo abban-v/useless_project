@@ -29,7 +29,7 @@ class RealShoeGame(tk.Toplevel):
         self.audio_ctrl = audio_ctrl
         self.on_finish = on_finish
         self.duration_seconds = duration_seconds
-        self.audio_enforcer = ShoeAudioEnforcer(self.audio_ctrl)
+        self.audio_enforcer = ShoeAudioEnforcer(self.audio_ctrl, master=master)
 
         self.screen_w = self.winfo_screenwidth()
         self.screen_h = self.winfo_screenheight()

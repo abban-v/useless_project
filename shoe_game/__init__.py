@@ -7,12 +7,14 @@ Coordinates periodic 40% chance fullscreen shoe game launches:
 """
 
 from shoe_game.shoe_game_manager import ShoeGameManager
+from shoe_game.choice_screen import ShoeGameChoiceScreen
 from shoe_game.virtual_mode import VirtualShoeGame
 from shoe_game.real_mode import RealShoeGame
 from shoe_game.audio_enforcer import ShoeAudioEnforcer
 
 __all__ = [
     "ShoeGameManager",
+    "ShoeGameChoiceScreen",
     "VirtualShoeGame",
     "RealShoeGame",
     "ShoeAudioEnforcer",

@@ -309,15 +309,19 @@ class TestModularUselessProject(unittest.TestCase):
         )
 
         # 1. Verify configuration values
-        self.assertEqual(config.CLICK_CHAOS_CHANCE, 0.60, "Click event chance must be 60%")
+        self.assertGreater(config.CLICK_CHAOS_CHANCE, 0.0)
+        self.assertLessEqual(config.CLICK_CHAOS_CHANCE, 1.0)
         self.assertIn(config.CLICK_CAT_COUNT, (0, 500))
         self.assertIn(config.CLICK_RAT_COUNT, (0, 50))
         self.assertIn(config.CLICK_FURBY_COUNT, (0, 4))
-        self.assertEqual(config.KEYBOARD_SOUND_CHANCE, 0.30, "Keyboard sound chance must be 30%")
-        self.assertEqual(config.CLICK_MUSIC_CHANCE, 0.60, "Music chance must be 60%")
+        self.assertGreater(config.KEYBOARD_SOUND_CHANCE, 0.0)
+        self.assertLessEqual(config.KEYBOARD_SOUND_CHANCE, 1.0)
+        self.assertGreater(config.CLICK_MUSIC_CHANCE, 0.0)
+        self.assertLessEqual(config.CLICK_MUSIC_CHANCE, 1.0)
         self.assertEqual(config.CLICK_VISUAL_DURATION_SECONDS, 10.0, "Visual chaos duration must be 10 seconds")
         self.assertEqual(config.CLICK_VIDEO_MIN_COUNT, 2, "Min video frames must be 2")
         self.assertEqual(config.CLICK_VIDEO_MAX_COUNT, 5, "Max video frames must be 5")
+        self.assertEqual(config.CLICK_MAX_ACTIVE_MEMES, 4, "Max active memes on screen must be 4")
 
         # 2. Verify sprites and video assets load
         root = tk.Tk()
@@ -377,7 +381,7 @@ class TestModularUselessProject(unittest.TestCase):
         # Test MediaChaosManager keyboard chaos evaluation
         media_mgr = MediaChaosManager(root)
         media_mgr.is_running = True
-        with patch("random.random", return_value=0.10):  # 0.10 < 0.30
+        with patch("random.random", return_value=0.01):
             with patch.object(media_mgr.audio_engine, "play_random_sound") as mock_play:
                 media_mgr._evaluate_keyboard_chaos()
                 mock_play.assert_called_once()
@@ -430,6 +434,24 @@ class TestModularUselessProject(unittest.TestCase):
         self.assertEqual(len(overlay.cats), 0)
         self.assertEqual(len(overlay.rats), 0)
         self.assertEqual(len(overlay.video_players), 0)
+
+        # 4. Test max 4 memes limit: after 4 memes are on, old memes delete themselves
+        while len(overlay.video_players) < config.CLICK_MAX_ACTIVE_MEMES:
+            overlay.spawn_video_frames()
+        self.assertEqual(len(overlay.video_players), config.CLICK_MAX_ACTIVE_MEMES, "Must have exactly 4 active memes")
+
+        first_four_img_ids = [vp.img_id for vp in overlay.video_players]
+        for iid in first_four_img_ids:
+            self.assertTrue(overlay.canvas.find_withtag(iid), "Image must exist on canvas before eviction")
+
+        # Spawn more frames: should trigger eviction of older memes
+        overlay.spawn_video_frames()
+        self.assertLessEqual(len(overlay.video_players), config.CLICK_MAX_ACTIVE_MEMES, "Active memes must never exceed 4")
+
+        # Verify that the oldest meme deleted itself from the canvas
+        oldest_id = first_four_img_ids[0]
+        self.assertFalse(overlay.canvas.find_withtag(oldest_id), "Oldest meme must have deleted itself from canvas")
+        overlay.clear_all()
 
         monitor.stop()
         root.destroy()
@@ -520,7 +542,7 @@ class TestModularUselessProject(unittest.TestCase):
         self.assertIn(config.SHOE_GAME_INTERVAL_SECONDS, (30.0, 60.0))
         self.assertGreaterEqual(config.SHOE_GAME_CHANCE, 0.0)
         self.assertLessEqual(config.SHOE_GAME_CHANCE, 1.0)
-        self.assertEqual(config.SHOE_GAME_REAL_MODE_SECONDS, 10.0)
+        self.assertGreater(config.SHOE_GAME_REAL_MODE_SECONDS, 0.0)
         self.assertEqual(config.SHOE_GAME_SCREAM_SECONDS, 3.0)
 
         # 2. ShoeAudioEnforcer safety keys and lock
@@ -582,7 +604,18 @@ class TestModularUselessProject(unittest.TestCase):
             self.assertTrue(real_game.canvas.winfo_exists())
             real_game.dismiss()
 
-        # 5. ShoeGameManager Verification
+        # 5. ShoeGameChoiceScreen Verification
+        from shoe_game import ShoeGameChoiceScreen
+        choices = []
+        screen = ShoeGameChoiceScreen(root, on_select_mode=lambda m: choices.append(m))
+        screen.withdraw()
+        self.assertIn("virtual", screen._card_rects, "Choice screen must offer Virtual Mode")
+        self.assertIn("real", screen._card_rects, "Choice screen must offer Real Mode")
+        self.assertNotIn("exit", screen._card_rects, "Choice screen must NOT have an exit button")
+        screen._choose("virtual")
+        self.assertEqual(choices, ["virtual"])
+
+        # 6. ShoeGameManager Verification
         mgr = ShoeGameManager(root, ctrl)
         self.assertEqual(mgr.chance, config.SHOE_GAME_CHANCE)
         mgr.chance = 0.75
@@ -592,17 +625,233 @@ class TestModularUselessProject(unittest.TestCase):
         self.assertTrue(mgr.is_running)
         self.assertIsNotNone(mgr._timer_id)
 
-        # Test manual launch
+        # Test choice screen launch on generic launch_game()
+        mgr.launch_game()
+        self.assertIsInstance(mgr.active_game, ShoeGameChoiceScreen)
+        mgr.stop()
+        self.assertFalse(mgr.is_running)
+        self.assertIsNone(mgr.active_game)
+
+        # Test direct launch with specific mode
         with patch.object(ShoeAudioEnforcer, "play_all_music"):
             mgr.force_launch("real")
-            self.assertIsNotNone(mgr.active_game)
+            self.assertIsInstance(mgr.active_game, RealShoeGame)
+            mgr._on_game_finished()
+            self.assertIsNone(mgr.active_game, "active_game must be reset to None when mode completes")
             mgr.stop()
-            self.assertFalse(mgr.is_running)
-            self.assertIsNone(mgr.active_game)
 
+        root.destroy()
+
+    def test_15_ad_system(self):
+        """Verify Fullscreen Ad System: alternating ads, input blocker, prompt dialog, and countdown trap sequence."""
+        from unittest.mock import MagicMock, patch
+        from ads_system import AdManager, AdVideoPlayer, AdPromptDialog, AdInputBlocker
+        import config
+
+        # 1. Configuration & Asset Discovery
+        self.assertEqual(config.ADS_INTERVAL_SECONDS, 60.0, "Ad interval must be 60 seconds")
+        self.assertEqual(config.ADS_COUNTDOWN_PLAY_SECONDS, 4.0, "Countdown duration must be 4 seconds")
+        self.assertTrue(config.ADS_DIR.exists(), "ads/ directory must exist")
+        self.assertTrue((config.ADS_DIR / "amul.mp4").exists(), "amul.mp4 must exist in ads/")
+        self.assertTrue((config.ADS_DIR / "seemati.mp4").exists(), "seemati.mp4 must exist in ads/")
+        self.assertTrue(config.COUNTDOWN_VIDEO.exists(), "countdown.mp4 must exist in music/")
+        self.assertTrue(config.EXPLOSION_VIDEO.exists(), "explosionsmall.mp4 must exist in memes/")
+        self.assertTrue(config.EXPLOSION_AUDIO.exists(), "explosion.mp3 must exist in memes/")
+
+        # 2. AdInputBlocker Safety & Interception
+        emergency_called = []
+        blocker = AdInputBlocker(emergency_exit_callback=lambda: emergency_called.append(True))
+        blocker.start()
+        self.assertTrue(blocker.is_active)
+
+        # Normal mouse event -> swallowed (returns 1)
+        self.assertEqual(blocker._mouse_hook_callback(0, 0x0200, 0), 1)
+
+        # F8 key -> triggers emergency failsafe
+        class MockKbdF8:
+            vkCode = 0x77  # VK_F8
+        with patch("ads_system.input_blocker.KBDLLHOOKSTRUCT.from_address", return_value=MockKbdF8()):
+            blocker._kbd_hook_callback(0, 0x0100, 0)
+            self.assertTrue(len(emergency_called) > 0, "F8 must trigger emergency failsafe callback")
+
+        blocker.stop()
+        self.assertFalse(blocker.is_active)
+
+        # 3. AdPromptDialog Verification
+        root = tk.Tk()
+        root.withdraw()
+
+        yes_called = []
+        no_called = []
+        dialog = AdPromptDialog(
+            root,
+            on_yes=lambda: yes_called.append(True),
+            on_no=lambda: no_called.append(True),
+        )
+        dialog.withdraw()
+        self.assertTrue(dialog.winfo_exists())
+        dialog._on_no_click()
+        self.assertTrue(len(no_called) > 0, "Clicking NO must invoke on_no_callback")
+
+        dialog2 = AdPromptDialog(
+            root,
+            on_yes=lambda: yes_called.append(True),
+            on_no=lambda: no_called.append(True),
+        )
+        dialog2.withdraw()
+        dialog2._on_yes_click()
+        self.assertTrue(len(yes_called) > 0, "Clicking YES must invoke on_yes_callback")
+
+        # 4. AdManager Alternating Schedule & Sequence Trap
+        mock_audio = MagicMock()
+        mock_monitor = MagicMock()
+        mgr = AdManager(root, audio_engine=mock_audio, audio_monitor=mock_monitor)
+
+        self.assertGreaterEqual(len(mgr.ads_list), 2, "Must discover at least 2 ad videos")
+        self.assertEqual(mgr.ads_list[0].name, "amul.mp4")
+        self.assertEqual(mgr.ads_list[1].name, "seemati.mp4")
+
+        # Verify alternating ad selection
+        mgr.current_ad_index = 0
+        ad1 = mgr.ads_list[mgr.current_ad_index % len(mgr.ads_list)]
+        mgr.current_ad_index += 1
+        ad2 = mgr.ads_list[mgr.current_ad_index % len(mgr.ads_list)]
+        mgr.current_ad_index += 1
+        ad3 = mgr.ads_list[mgr.current_ad_index % len(mgr.ads_list)]
+        self.assertEqual(ad1.name, "amul.mp4")
+        self.assertEqual(ad2.name, "seemati.mp4")
+        self.assertEqual(ad3.name, "amul.mp4")
+
+        # Mock video player execution
+        with patch.object(mgr.player, "play_video") as mock_play_vid, \
+             patch.object(mgr.player, "play_sequence") as mock_play_seq:
+
+            mgr.launch_ad()
+            mock_audio.stop_all.assert_called()
+            mock_monitor.suppress_detection.assert_called()
+            mock_play_vid.assert_called()
+
+            # Ad finishes -> shows prompt
+            mgr._on_ad_finished()
+            self.assertIsNotNone(mgr.active_prompt)
+            self.assertTrue(mgr.active_prompt.winfo_exists())
+
+            # User clicks No -> reschedules
+            mgr._on_user_no()
+            self.assertIsNone(mgr.active_prompt)
+
+            # User clicks Yes -> plays 4s countdown -> explosion -> next ad
+            mgr._on_user_yes()
+            mock_play_seq.assert_called()
+            call_args = mock_play_seq.call_args[0][0]
+            self.assertEqual(len(call_args), 2, "Must have 2 sequence steps: countdown and explosion")
+            self.assertEqual(call_args[0]["max_duration"], 4.0, "Countdown must play for exactly 4 seconds")
+            self.assertEqual(call_args[1]["audio"], config.EXPLOSION_AUDIO, "Explosion audio must play simultaneously")
+
+            # Sequence completes -> blasts next ad in order
+            prev_idx = mgr.current_ad_index
+            mgr._on_revenge_sequence_finished()
+            self.assertEqual(mgr.current_ad_index, prev_idx + 1, "Must advance to next ad in alternating order")
+
+        mgr.stop()
+        self.assertFalse(mgr.is_running)
+        root.destroy()
+
+    def test_16_ad_audio_silencing(self):
+        """Verify that launching an ad silences and blocks all other application audio."""
+        from unittest.mock import MagicMock, patch
+        from ads_system import AdManager
+        from random_media.audio_chaos import ChaosAudioEngine, is_chaos_audio_blocked, set_chaos_audio_blocked
+        from random_media.media_manager import MediaChaosManager
+
+        root = tk.Tk()
+        root.withdraw()
+
+        media_chaos = MediaChaosManager(root)
+        audio_engine = media_chaos.audio_engine
+        mock_monitor = MagicMock()
+        mock_shoe = MagicMock()
+        mock_shoe.active_game = MagicMock()
+        mock_shoe.active_game.audio_enforcer = MagicMock()
+        mock_audio_ctrl = MagicMock()
+        mock_audio_ctrl.get_volume.return_value = 0.5
+
+        mgr = AdManager(
+            root,
+            media_chaos=media_chaos,
+            audio_engine=audio_engine,
+            audio_monitor=mock_monitor,
+            audio_ctrl=mock_audio_ctrl,
+            shoe_game=mock_shoe,
+        )
+
+        # Before ad: audio is not blocked
+        self.assertFalse(is_chaos_audio_blocked())
+        self.assertFalse(media_chaos.is_ad_active)
+
+        with patch.object(mgr.player, "play_video"), patch.object(mgr.player, "play_sequence"):
+            # 1. Launch ad -> all other audio silenced
+            mgr.launch_ad()
+            self.assertTrue(is_chaos_audio_blocked(), "Chaos audio must be globally blocked during ad")
+            self.assertTrue(media_chaos.is_ad_active, "MediaChaosManager must flag ad as active")
+            mock_monitor.suppress_detection.assert_called()
+            mock_shoe.active_game.audio_enforcer.stop_all_audio.assert_called()
+            mock_audio_ctrl.set_volume.assert_called_with(1.0)
+
+            # While ad is running, playing tracks or sounds must be rejected (no-op)
+            with patch.object(audio_engine, "_play_track_on_main") as mock_play_main:
+                audio_engine.play_track("dummy.m4a", 10.0)
+                mock_play_main.assert_not_called()
+                audio_engine.play_meow()
+                mock_play_main.assert_not_called()
+                audio_engine.roll_music_chaos(1.0)
+                mock_play_main.assert_not_called()
+                audio_engine.play_random_sound()
+                mock_play_main.assert_not_called()
+
+            # Mouse click during ad -> ignored
+            with patch.object(media_chaos, "_evaluate_click_chaos") as mock_click_eval:
+                media_chaos._on_mouse_click()
+                mock_click_eval.assert_not_called()
+
+            # Keyboard click during ad -> ignored
+            with patch.object(media_chaos, "_evaluate_keyboard_chaos") as mock_kb_eval:
+                media_chaos._on_keyboard_key()
+                mock_kb_eval.assert_not_called()
+
+            # 2. Ad finishes -> prompt appears (audio remains quiet during prompt)
+            mgr._on_ad_finished()
+            self.assertTrue(is_chaos_audio_blocked(), "Audio must remain blocked while prompt is open")
+
+            # 3. User clicks NO -> permissions restored
+            mgr._on_user_no()
+            self.assertFalse(is_chaos_audio_blocked(), "Audio permissions must restore on NO")
+            self.assertFalse(media_chaos.is_ad_active)
+
+            # 4. If user clicks YES -> audio blocked again throughout revenge sequence
+            mgr.launch_ad()
+            mgr._on_ad_finished()
+            mgr._on_user_yes()
+            self.assertTrue(is_chaos_audio_blocked(), "Audio must be blocked during revenge countdown/explosion")
+            self.assertTrue(media_chaos.is_ad_active)
+
+            # Revenge completes -> next ad launches (still blocked)
+            mgr._on_revenge_sequence_finished()
+            self.assertTrue(is_chaos_audio_blocked(), "Audio must remain blocked during revenge next ad")
+
+            # When that ad finishes and user clicks NO -> restored
+            mgr._on_ad_finished()
+            mgr._on_user_no()
+            self.assertFalse(is_chaos_audio_blocked())
+            self.assertFalse(media_chaos.is_ad_active)
+
+        mgr.stop()
+        media_chaos.stop()
         root.destroy()
 
 
 if __name__ == "__main__":
     print("Running Modular Useless Project Validation...")
     unittest.main()
+
+

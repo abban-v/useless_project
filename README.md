@@ -27,14 +27,15 @@ the meaning of our exisence
 2. **Flashbang Hazard**: Every 60 seconds, rolls a 60% chance to blind the screen with a full-screen whiteout and a cinematic BOOM explosion with fading tinnitus ring. Extensible architecture allows easily registering future hazards.
 3. **Mouse Stamina Bar**: Mouse has physical stamina displayed by a high-contrast floating bar directly above the cursor (White -> Orange -> Red). Moving depletes stamina; stopping regenerates it. If depleted to 0%, the mouse enters **"ONE MOMENT OF SILENCE"** where the cursor and all Windows gestures are completely frozen for 60 seconds with "RIP" on the bar and giant raw Arial 72 text on screen.
 4. **Keyboard Scrambler**: 40% of the time while typing, the typed letter is randomly swapped with an adjacent QWERTY key (e.g., typing `g` produces `h` or a neighboring letter).
-5. **Emergency Failsafe**: Press `F8` or `Ctrl + Shift + Q` anywhere, anytime to safely restore mouse speed, unfreeze cursor, restore audio, and exit cleanly.
+5. **LOVE IS ALL**: PLETHORA OF OTHER FEAUTURES CHECK IT OUT YOURSELF YOU LAZY IDIOT!
+6. **Emergency Failsafe**: Press `F8` or `Ctrl + Shift + Q` anywhere, anytime to safely restore mouse speed, unfreeze cursor, restore audio, and exit cleanly.
 \
 You might be wondering, why do we hate our lives so much and why we would want anyone to subject ourselves and you to this torture? \
 To that we say, welcome to computer science, where we make stuff up for the sake of it
 
 ## Technical Details
 ### Technologies/Components Used
-For Software:
+
 - **Languages**: Python 3.14
 - **Windows APIs**:
   - `ctypes` COM interfaces (`IMMDeviceEnumerator`, `IAudioEndpointVolume`, `IAudioMeterInformation`) for zero-dependency native Windows Core Audio control.
@@ -44,7 +45,7 @@ For Software:
 - **Audio Synthesizer**: Pure standard library procedural WAV generator (`wave`, `struct`, `math`) for offline sound effects (Explosion BOOM, air pump hiss, victory chime).
 
 ### Implementation
-For Software:
+
 # Installation
 ```powershell
 git clone <repo-url>
@@ -64,7 +65,6 @@ python test_useless.py
 ```
 
 ### Project Documentation
-For Software:
 
 # Screenshots (Add at least 3)
 ![Screenshot1](Add screenshot 1 here with proper name)
@@ -84,14 +84,6 @@ For Software:
 # Video
 [Add your demo video link here]
 *Explain what the video demonstrates*
-
-# Additional Demos
-[Add any extra demo materials/links]
-
-## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 

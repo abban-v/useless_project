@@ -69,8 +69,9 @@ class ShoeAudioEnforcer:
         0xB3,  # VK_MEDIA_PLAY_PAUSE
     }
 
-    def __init__(self, audio_ctrl=None):
+    def __init__(self, audio_ctrl=None, master=None):
         self.audio_ctrl = audio_ctrl
+        self.master = master
         if self.audio_ctrl is None:
             try:
                 from audio_pump.audio_controller import WindowsAudioController
@@ -187,24 +188,50 @@ class ShoeAudioEnforcer:
             print(f"[ShoeAudioEnforcer] Error playing {file_path}: {err}")
             return None
 
+    def _schedule_stop(self, players: list, duration: float):
+        """Safely schedules stopping and closing of players on the main thread or with COM apartment init."""
+        def _do_stop():
+            for p in players:
+                try:
+                    p.controls.stop()
+                    p.close()
+                except Exception:
+                    pass
+                if p in self._active_players:
+                    try:
+                        self._active_players.remove(p)
+                    except Exception:
+                        pass
+
+        if self.master:
+            try:
+                self.master.after(int(duration * 1000), _do_stop)
+                return
+            except Exception:
+                pass
+
+        def _thread_stop():
+            time.sleep(duration)
+            try:
+                ole32.CoInitialize(None)
+                _do_stop()
+            except Exception:
+                pass
+            finally:
+                try:
+                    ole32.CoUninitialize()
+                except Exception:
+                    pass
+
+        threading.Thread(target=_thread_stop, daemon=True).start()
+
     def play_single_scream(self, duration: float = 3.0):
         """Plays scream.m4a for duration seconds at 100% locked volume."""
         self.start_lock()
         player = self._play_single_player(str(SCREAM_PATH))
         if player:
             self._active_players.append(player)
-
-            def _stop_later():
-                time.sleep(duration)
-                try:
-                    player.controls.stop()
-                    player.close()
-                except Exception:
-                    pass
-                if player in self._active_players:
-                    self._active_players.remove(player)
-
-            threading.Thread(target=_stop_later, daemon=True).start()
+            self._schedule_stop([player], duration)
 
     def play_double_scream(self, duration: float = 3.0):
         """Plays BOTH scream.m4a AND scream2.m4a simultaneously for duration seconds at 100% locked volume."""
@@ -214,19 +241,8 @@ class ShoeAudioEnforcer:
 
         players = [p for p in (p1, p2) if p is not None]
         self._active_players.extend(players)
-
-        def _stop_both_later():
-            time.sleep(duration)
-            for p in players:
-                try:
-                    p.controls.stop()
-                    p.close()
-                except Exception:
-                    pass
-                if p in self._active_players:
-                    self._active_players.remove(p)
-
-        threading.Thread(target=_stop_both_later, daemon=True).start()
+        if players:
+            self._schedule_stop(players, duration)
 
     def play_all_music(self, duration: float = 10.0):
         """Blasts ALL audio tracks in music/ simultaneously at 100% locked volume."""
@@ -245,19 +261,8 @@ class ShoeAudioEnforcer:
 
         self._active_players.extend(players)
         print(f"[ShoeAudioEnforcer] Blasting {len(players)} music tracks simultaneously at 100% volume for {duration}s!")
-
-        def _stop_all_later():
-            time.sleep(duration)
-            for p in players:
-                try:
-                    p.controls.stop()
-                    p.close()
-                except Exception:
-                    pass
-                if p in self._active_players:
-                    self._active_players.remove(p)
-
-        threading.Thread(target=_stop_all_later, daemon=True).start()
+        if players:
+            self._schedule_stop(players, duration)
 
     def stop_all_audio(self):
         """Stops and closes all active players and stops volume lock."""
@@ -265,6 +270,7 @@ class ShoeAudioEnforcer:
         self._active_players.clear()
         for p in players:
             try:
+                p.settings.volume = 0
                 p.controls.stop()
                 p.close()
             except Exception:

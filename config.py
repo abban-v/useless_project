@@ -83,22 +83,22 @@ BAR_Y_OFFSET = -28                # Pixels above the cursor tip
 # 40% chance of a typed letter being randomly changed to an adjacent/different letter
 KEYBOARD_SCRAMBLE_CHANCE = 0.40
 
-# 30% chance on each keyboard click that any sound in music/ folder starts playing
-KEYBOARD_SOUND_CHANCE = 0.30
+# 10% chance on each keyboard click that any sound in music/ folder starts playing
+KEYBOARD_SOUND_CHANCE = 0.10
 
 # ==========================================
 # Click-Triggered Media Chaos
 # ==========================================
-# 60% chance for meme popups on every click
-CLICK_CHAOS_CHANCE = 0.60
+# 30% chance for meme popups on every click
+CLICK_CHAOS_CHANCE = 0.30
 
 # Bouncing cats and spinning rats removed due to issues
 CLICK_CAT_COUNT = 0
 CLICK_RAT_COUNT = 0
 CLICK_FURBY_COUNT = 0
 
-# 60% chance for each music track in music/ folder (except meow.m4a)
-CLICK_MUSIC_CHANCE = 0.60
+# 10% chance for each music track in music/ folder (except meow.m4a)
+CLICK_MUSIC_CHANCE = 0.10
 
 # Stagger interval in milliseconds when spawning cats
 CAT_SPAWN_STAGGER_MS = 20
@@ -111,6 +111,10 @@ CLICK_VIDEO_MIN_COUNT = 2
 CLICK_VIDEO_MAX_COUNT = 5
 CLICK_VIDEO_WIDTH = 160
 CLICK_VIDEO_HEIGHT = 218
+
+# Maximum active memes/video frames allowed on screen at any time.
+# Once 4 memes are on, older memes delete themselves (FIFO).
+CLICK_MAX_ACTIVE_MEMES = 4
 
 # ==========================================
 # Reddit Meme Sourcing (Images & Videos Only)
@@ -131,18 +135,42 @@ REDDIT_CLIENT_SECRET = ""
 # ==========================================
 # Shoe Game Hazard
 # ==========================================
-# Periodic check every minute (30s)
-SHOE_GAME_INTERVAL_SECONDS = 30.0
+# Periodic check every minute (60s)
+SHOE_GAME_INTERVAL_SECONDS = 60.0
 
 # Chance of shoe game launching on each periodic check (60% default)
 SHOE_GAME_CHANCE = 0.60
 
 # Duration of Real Mode ("shoes can't think") in seconds
-SHOE_GAME_REAL_MODE_SECONDS = 10.0
+SHOE_GAME_REAL_MODE_SECONDS = 7
 
 # Duration of Virtual Mode walking phase in seconds
-SHOE_GAME_VIRTUAL_MODE_SECONDS = 20.0
+SHOE_GAME_VIRTUAL_MODE_SECONDS = 7
 
 # Duration of scream audio blast in seconds
 SHOE_GAME_SCREAM_SECONDS = 3.0
+
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+MUSIC_DIR = BASE_DIR / "music"
+MEMES_DIR = BASE_DIR / "memes"
+
+# ==========================================
+# Fullscreen Ad System
+# ==========================================
+# Interval in seconds between periodic fullscreen ad popups (every 60 SECONDS)
+ADS_INTERVAL_SECONDS = 60.0
+
+# Directory containing ad video files
+ADS_DIR = BASE_DIR / "ads"
+
+# Duration of countdown.mp4 to play before cutting to explosion (first 4 seconds)
+ADS_COUNTDOWN_PLAY_SECONDS = 4.0
+
+# Sequence assets
+COUNTDOWN_VIDEO = MUSIC_DIR / "countdown.mp4"
+EXPLOSION_VIDEO = MEMES_DIR / "explosionsmall.mp4"
+EXPLOSION_AUDIO = MEMES_DIR / "explosion.mp3"
+
 

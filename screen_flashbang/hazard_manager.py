@@ -120,6 +120,11 @@ class HazardManager:
         if not self.is_running:
             return
 
+        # Do not interrupt or blast audio over active fullscreen ads
+        if hasattr(self, "ad_manager") and self.ad_manager and getattr(self.ad_manager, "is_ad_active", False):
+            self._schedule_next_check()
+            return
+
         cur_chance = self.chance
         roll = random.random()
         print(f"[HazardManager] Periodic check: roll {roll:.3f} vs chance {cur_chance:.2f}")

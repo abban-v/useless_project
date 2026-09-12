@@ -11,6 +11,7 @@ import tkinter as tk
 from typing import Optional
 
 import config
+from shoe_game.choice_screen import ShoeGameChoiceScreen
 from shoe_game.virtual_mode import VirtualShoeGame
 from shoe_game.real_mode import RealShoeGame
 
@@ -19,6 +20,8 @@ class ShoeGameManager:
     """
     Coordinates periodic evaluation and spawning of the Shoe Game.
     Dynamically tracks chance and interval settings.
+    Presents the fullscreen 'SHOE GAME' choice screen allowing selection between
+    Virtual Mode and Real Mode.
     """
 
     def __init__(
@@ -77,7 +80,7 @@ class ShoeGameManager:
         )
 
     def stop(self):
-        """Cleanly terminates timer and closes any active shoe game."""
+        """Cleanly terminates timer and closes any active shoe game or choice screen."""
         self.is_running = False
         if self._timer_id is not None:
             try:
@@ -88,7 +91,10 @@ class ShoeGameManager:
 
         if self.active_game is not None:
             try:
-                self.active_game.dismiss()
+                if hasattr(self.active_game, "dismiss"):
+                    self.active_game.dismiss()
+                else:
+                    self.active_game.destroy()
             except Exception:
                 pass
             self.active_game = None
@@ -104,8 +110,12 @@ class ShoeGameManager:
         if not self.is_running:
             return
 
-        # Do not launch a new game if one is already currently open
+        # Do not launch a new game if one is already currently open or if an ad is active
         if self.active_game is not None:
+            self._schedule_check()
+            return
+
+        if hasattr(self, "ad_manager") and self.ad_manager and getattr(self.ad_manager, "is_ad_active", False):
             self._schedule_check()
             return
 
@@ -114,18 +124,37 @@ class ShoeGameManager:
         print(f"[ShoeGameManager] Minute check: roll {roll:.3f} vs chance {cur_chance:.2f}")
 
         if roll < cur_chance or cur_chance >= 1.0:
-            mode = "virtual" if random.random() < 0.5 else "real"
-            self.launch_game(mode)
+            self.launch_game()
 
         self._schedule_check()
 
-    def launch_game(self, mode: str = "virtual"):
-        """Launches the fullscreen Shoe Game in the specified mode ('virtual' or 'real')."""
+    def launch_game(self, mode: Optional[str] = None):
+        """
+        Launches the fullscreen Shoe Game.
+        If mode is None or 'choice', presents the ShoeGameChoiceScreen with heading 'SHOE GAME'.
+        Otherwise launches the requested mode ('virtual' or 'real') directly.
+        """
         if self.active_game is not None:
             return
 
         cur_chance = self.chance
-        print(f"[ShoeGameManager] {int(cur_chance * 100)}% HIT! Launching Shoe Game in [{mode.upper()} MODE] fullscreen!")
+        if mode in ("virtual", "real"):
+            self._start_mode(mode)
+        else:
+            print(f"[ShoeGameManager] {int(cur_chance * 100)}% HIT! Launching Shoe Game Choice Screen...")
+            self.active_game = ShoeGameChoiceScreen(
+                master=self.root,
+                on_select_mode=self._on_mode_selected,
+            )
+
+    def _on_mode_selected(self, mode: str):
+        """Called when player selects a mode on the ShoeGameChoiceScreen."""
+        self.active_game = None
+        self._start_mode(mode)
+
+    def _start_mode(self, mode: str):
+        """Starts the chosen Shoe Game mode fullscreen."""
+        print(f"[ShoeGameManager] Starting Shoe Game in [{mode.upper()} MODE] fullscreen!")
 
         # Suppress audio monitor and dismiss pump overlay so shoe audio plays without triggering pump volume drops
         if self.audio_monitor is not None:
@@ -161,10 +190,8 @@ class ShoeGameManager:
 
     def force_launch(self, mode: Optional[str] = None):
         """Convenience method to immediately trigger shoe game without waiting."""
-        if mode is None:
-            mode = "virtual" if random.random() < 0.5 else "real"
         self.launch_game(mode)
 
     def _on_game_finished(self):
         self.active_game = None
-        print("[ShoeGameManager] Shoe Game completed. Returned to desktop.")
+        print("[ShoeGameManager] Shoe Game completed. Main application continuing normally.")

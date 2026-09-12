@@ -1,7 +1,7 @@
 """
 Multi-Track Chaos Audio Engine for Click Chaos Module.
 Plays 'music/meow.m4a' on cat spawn thresholds and manages independent 60% chance
-playback of all ambient chaos tracks (coconut.m4a, scream.m4a, scream2.m4a, song.m4a, song2.m4a, song3.m4a)
+playback of all ambient chaos tracks (coconut.m4a, scream.m4a, scream2.m4a, song.m4a, song3.m4a)
 concurrently using native Windows COM WMPlayer.OCX dispatched via the Tkinter message loop.
 """
 
@@ -21,6 +21,20 @@ MEOW_PATH = MUSIC_DIR / "meow.m4a"
 
 _active_engines = weakref.WeakSet()
 _track_duration_cache = {}
+_audio_blocked = False
+
+
+def set_chaos_audio_blocked(blocked: bool):
+    """Sets global block flag and immediately halts all audio if blocked is True."""
+    global _audio_blocked
+    _audio_blocked = blocked
+    if blocked:
+        stop_all_chaos_audio()
+
+
+def is_chaos_audio_blocked() -> bool:
+    """Returns True if chaos audio playback is currently suppressed (e.g. during ad playback)."""
+    return _audio_blocked
 
 
 def get_track_duration(file_path: str) -> float:
@@ -76,6 +90,8 @@ class ChaosAudioEngine:
 
     def play_track(self, file_path: str, duration: float = 10.0, is_music: bool = False):
         """Dispatches track playback onto Tkinter's message-pumped main thread."""
+        if _audio_blocked:
+            return
         self._playback_end_time = max(self._playback_end_time, time.time() + duration)
         if is_music:
             self._music_playback_end_time = max(self._music_playback_end_time, time.time() + duration)
@@ -87,7 +103,7 @@ class ChaosAudioEngine:
 
     def _play_track_on_main(self, file_path: str, duration: float, is_music: bool = False):
         """Instantiates and starts WMPlayer.OCX on the main thread."""
-        if not os.path.exists(file_path):
+        if _audio_blocked or not os.path.exists(file_path):
             return
 
         try:
@@ -132,6 +148,8 @@ class ChaosAudioEngine:
 
     def play_meow(self):
         """Plays music/meow.m4a on cat spawn threshold."""
+        if _audio_blocked:
+            return
         now = time.time()
         # Allow natural overlapping meows while preventing runaway instantiation
         if now - self._last_meow_time > 0.35:
@@ -142,11 +160,11 @@ class ChaosAudioEngine:
     def roll_music_chaos(self, chance: float = CLICK_MUSIC_CHANCE):
         """
         Evaluates an independent 60% chance for EACH track in music/ (excluding meow.m4a).
-        Supports all tracks in music/ including song2.m4a, song3.m4a, coconut.m4a,
+        Supports all tracks in music/ including song3.m4a, coconut.m4a,
         scream.m4a, scream2.m4a, song.m4a, etc.
         Multiple tracks can play simultaneously.
         """
-        if not MUSIC_DIR.exists():
+        if _audio_blocked or not MUSIC_DIR.exists():
             return
 
         valid_exts = {".m4a", ".mp3", ".wav", ".aac", ".ogg"}
@@ -167,7 +185,7 @@ class ChaosAudioEngine:
         Picks any sound from the music/ folder at random and starts playing it.
         Triggered with 30% chance on each keyboard click.
         """
-        if not MUSIC_DIR.exists():
+        if _audio_blocked or not MUSIC_DIR.exists():
             return
 
         valid_exts = {".m4a", ".mp3", ".wav", ".aac", ".ogg"}
@@ -209,9 +227,11 @@ class ChaosAudioEngine:
         self._active_music_players.clear()
         for player in players:
             try:
+                player.settings.volume = 0
                 player.controls.stop()
                 player.close()
             except Exception:
                 pass
         print("[ChaosAudio] All chaos audio stopped.")
+
 

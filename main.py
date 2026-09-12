@@ -24,6 +24,7 @@ from config import (
     KEYBOARD_SOUND_CHANCE,
     SHOE_GAME_CHANCE,
     SHOE_GAME_INTERVAL_SECONDS,
+    ADS_INTERVAL_SECONDS,
 )
 from audio_pump import WindowsAudioController, AudioHazardMonitor, PumpOverlay
 from screen_flashbang import HazardManager, stop_flashbang_audio
@@ -31,6 +32,7 @@ from mouse_stamina import MouseSpeedController, MouseStaminaHUD, attach_input_de
 from keyboard_scramble import KeyboardScrambler
 from random_media import MediaChaosManager
 from shoe_game import ShoeGameManager
+from ads_system import AdManager
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -61,6 +63,7 @@ class UselessApp:
         print(f"  * Keyboard Chaos:  {int(KEYBOARD_SCRAMBLE_CHANCE * 100)}% letter swapping & {int(KEYBOARD_SOUND_CHANCE * 100)}% sound on key click")
         print(f"  * Click Chaos:     60% chance on click -> Rectangular Meme/Video Frames & Concurrent Music")
         print(f"  * Shoe Game:       {int(SHOE_GAME_CHANCE * 100)}% chance every {int(SHOE_GAME_INTERVAL_SECONDS)}s -> Fullscreen Virtual/Real Shoe Chaos")
+        print(f"  * Fullscreen Ads:  Every {int(ADS_INTERVAL_SECONDS)}s alternating ads -> Freeze input & Prompt trap")
         print(" Safety:")
         print("  * Press [F8] or [Ctrl + Shift + Q] anywhere to EMERGENCY EXIT & RESTORE!")
         print("=" * 60)
@@ -118,7 +121,21 @@ class UselessApp:
             pump_overlay=self.pump_overlay,
         )
 
-        # 9. Safety Hotkey Thread
+        # 9. Fullscreen Ad System (1-minute alternating ads, input blocker, prompt & trap sequence)
+        self.ad_manager = AdManager(
+            self.root,
+            media_chaos=self.media_chaos,
+            audio_engine=self.media_chaos.audio_engine,
+            audio_monitor=self.audio_monitor,
+            audio_ctrl=self.audio_ctrl,
+            shoe_game=self.shoe_game,
+            hazard_manager=self.hazard_manager,
+            emergency_exit_callback=self.shutdown,
+        )
+        self.hazard_manager.ad_manager = self.ad_manager
+        self.shoe_game.ad_manager = self.ad_manager
+
+        # 10. Safety Hotkey Thread
         self.is_running = True
         self.hotkey_thread = threading.Thread(target=self._hotkey_listener, daemon=True)
 
@@ -163,6 +180,7 @@ class UselessApp:
         self.keyboard_scrambler.start()
         self.media_chaos.start()
         self.shoe_game.start()
+        self.ad_manager.start()
         self.hotkey_thread.start()
 
         try:
@@ -176,6 +194,11 @@ class UselessApp:
             return
         self.is_running = False
         print("\n[UselessApp] Cleaning up and restoring Windows parameters...")
+
+        try:
+            self.ad_manager.stop()
+        except Exception:
+            pass
 
         try:
             self.shoe_game.stop()

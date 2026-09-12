@@ -14,6 +14,7 @@ from typing import List, Dict, Any, Optional
 import win32gui
 import win32con
 
+import config
 from config import (
     CLICK_CAT_COUNT,
     CLICK_RAT_COUNT,
@@ -24,6 +25,7 @@ from config import (
     CLICK_VIDEO_MAX_COUNT,
     CLICK_VIDEO_WIDTH,
     CLICK_VIDEO_HEIGHT,
+    CLICK_MAX_ACTIVE_MEMES,
 )
 from random_media.assets.sprites import (
     get_cat_sprite,
@@ -63,9 +65,30 @@ class SpinningRat:
 
 
 class VideoPlayer:
-    __slots__ = ("img_id", "border_id", "header_id", "text_id", "x", "y", "frame_idx", "frames")
+    __slots__ = (
+        "img_id",
+        "border_id",
+        "header_id",
+        "text_id",
+        "x",
+        "y",
+        "frame_idx",
+        "frames",
+        "dismiss_timer_id",
+    )
 
-    def __init__(self, img_id: int, border_id: int, header_id: int, text_id: int, x: float, y: float, frame_idx: int, frames: list):
+    def __init__(
+        self,
+        img_id: int,
+        border_id: int,
+        header_id: int,
+        text_id: int,
+        x: float,
+        y: float,
+        frame_idx: int,
+        frames: list,
+        dismiss_timer_id=None,
+    ):
         self.img_id = img_id
         self.border_id = border_id
         self.header_id = header_id
@@ -74,6 +97,7 @@ class VideoPlayer:
         self.y = y
         self.frame_idx = frame_idx
         self.frames = frames
+        self.dismiss_timer_id = dismiss_timer_id
 
 
 class ChaosOverlay:
@@ -184,8 +208,49 @@ class ChaosOverlay:
         """Returns True if any visual chaos entities are currently active on screen."""
         return bool(self.cats or self.rats or self.furby_items or self.video_players or self._pending_cat_spawns)
 
+    def remove_video_player(self, player: VideoPlayer):
+        """Removes an active meme / video player from the canvas and frees its resources."""
+        if getattr(player, "dismiss_timer_id", None) is not None:
+            try:
+                self.master.after_cancel(player.dismiss_timer_id)
+            except Exception:
+                pass
+            player.dismiss_timer_id = None
+
+        if self.canvas:
+            for item_id in (player.img_id, player.border_id, player.header_id, player.text_id):
+                try:
+                    self.canvas.delete(item_id)
+                except Exception:
+                    pass
+
+        if player in self.video_players:
+            self.video_players.remove(player)
+
+    def remove_oldest_video_player(self):
+        """Removes the oldest active meme on screen (FIFO)."""
+        if self.video_players:
+            oldest = self.video_players[0]
+            self.remove_video_player(oldest)
+
+    def _on_single_meme_dismiss(self, player: VideoPlayer):
+        """Called when an individual meme's display duration has elapsed."""
+        if player in self.video_players:
+            # If ambient music is actively playing, retain active memes up to the max (4)
+            if (
+                self.audio_engine
+                and hasattr(self.audio_engine, "is_music_track_playing")
+                and self.audio_engine.is_music_track_playing()
+            ):
+                return
+            self.remove_video_player(player)
+            if not self.has_active_visuals():
+                self.clear_all()
+
     def spawn_video_frames(self):
-        """Spawns 2-5 small rectangular video frames anywhere within display bounds."""
+        """Spawns small rectangular video frames anywhere within display bounds.
+        Enforces a maximum of CLICK_MAX_ACTIVE_MEMES (4) on screen by having older memes delete themselves.
+        """
         self._ensure_overlay()
         self._schedule_auto_dismiss()
 
@@ -243,7 +308,20 @@ class ChaosOverlay:
             )
             img_id = self.canvas.create_image(x, y, image=frames[start_frame], anchor="center")
 
-            self.video_players.append(VideoPlayer(img_id, border_id, header_id, text_id, x, y, start_frame, frames))
+            player = VideoPlayer(img_id, border_id, header_id, text_id, x, y, start_frame, frames)
+            # Schedule self-deletion when meme's duration expires
+            player.dismiss_timer_id = self.master.after(
+                int(CLICK_VISUAL_DURATION_SECONDS * 1000),
+                lambda p=player: self._on_single_meme_dismiss(p),
+            )
+            self.video_players.append(player)
+
+            # Enforce max active memes: once 4 memes are on, the oldest memes delete themselves
+            max_active = getattr(config, "CLICK_MAX_ACTIVE_MEMES", CLICK_MAX_ACTIVE_MEMES)
+            while len(self.video_players) > max_active:
+                oldest_player = self.video_players[0]
+                self.remove_video_player(oldest_player)
+                print(f"[ChaosOverlay] {max_active} memes limit reached! Old meme deleted itself (remaining: {len(self.video_players)}).")
 
         print(f"[ChaosOverlay] Spawned {count} rectangular meme/video frames (total: {len(self.video_players)}).")
         self._start_simulation()
@@ -406,6 +484,15 @@ class ChaosOverlay:
         self._is_simulating = False
         self._is_spawning_cats = False
         self._pending_cat_spawns = 0
+
+        for vp in self.video_players:
+            if getattr(vp, "dismiss_timer_id", None) is not None:
+                try:
+                    self.master.after_cancel(vp.dismiss_timer_id)
+                except Exception:
+                    pass
+                vp.dismiss_timer_id = None
+
         self.cats.clear()
         self.rats.clear()
         self.furby_items.clear()
