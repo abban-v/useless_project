@@ -71,11 +71,11 @@ python main.py
 
 ### Project Demo
 # Video
-[[Woww](https://photos.app.goo.gl/XsqRXqvrqB6nmSAr5)]
+[Woww](https://photos.app.goo.gl/XsqRXqvrqB6nmSAr5)
 *Chaos Unleashed*
 
-# The actual chaos
-
+### The actual chaos
+[Watch if you dare](https://drive.google.com/file/d/1aV0_LQH1FvuLMJh_kVgk5oUt7b_-T5XC/view?usp=sharing)
 ---
 Made with ❤️ at TinkerHub Useless Projects 
 
